@@ -254,7 +254,13 @@ public class PaserItemsPaser {
         code_item.insns_size = PaserUtil.byte2int(PaserHaeder.getHeaderInfoByoff2(4));
 
         for (int i = 0; i < code_item.insns_size; i++) {
-            code_item.insns.add(PaserUtil.byte2int(PaserHaeder.getHeaderInfoByoff2(2)));
+            int op = PaserUtil.byte2int(PaserHaeder.getHeaderInfoByoff2(2));
+            code_item.insns.add(op);
+
+            if (i%2==0){
+                Opcode2Smail(op);
+            }
+
         }
         return code_item;
     }
@@ -262,6 +268,12 @@ public class PaserItemsPaser {
 
     public static void Opcode2Smail(int opcode){
 
+        for (Opcodes.Opcode op:Opcodes.Opcode.values()) {
+            if (Integer.parseInt(op.toString())==opcode){
+                String gOpName = Opcodes.gOpNames[op.ordinal()];
+                System.out.println("\n\t"+gOpName);
+            }
+        }
 
     }
 
