@@ -14,7 +14,6 @@ public class PaserUtil {
         for (int i = 0; i < bytes.length; i++) {
             String s = Integer.toHexString((bytes[i] & 0x000000FF) | 0xFFFFFF00).substring(6);
             stringBuffer.append(s);
-
         }
         return stringBuffer.toString();
     }

@@ -153,7 +153,8 @@ public class PaserItemsPaser {
 
             classs.class_idx = header_types.get(class_idx).str;
             classs.ACCESS_FLAGS = ACCESS_FLAGS;
-            classs.ACCESS_FLAGS_string = PaserUtil.GetFriendlyAccessFlags(ACCESS_FLAGS).toString();;
+            classs.ACCESS_FLAGS_string = PaserUtil.GetFriendlyAccessFlags(ACCESS_FLAGS).toString();
+            ;
             classs.superclass_idx = header_types.get(superclass_idx).str;
             classs.interfaces_off = interfaces_off;
             classs.source_file_idx = header_strings.get(source_file_idx).str;
@@ -182,7 +183,7 @@ public class PaserItemsPaser {
                         encodedField.filed_idx_diff = PaserUtil.decodeUleb128(PaserUtil.readUnsignedLeb128());
 
                         encodedField.access_flags = PaserUtil.decodeUleb128(PaserUtil.readUnsignedLeb128());
-                        encodedField.access_flags_string=PaserUtil.GetFriendlyAccessFlags(encodedField.access_flags).toString();
+                        encodedField.access_flags_string = PaserUtil.GetFriendlyAccessFlags(encodedField.access_flags).toString();
 
                         classs.class_data.static_fields.add(encodedField);
                     }
@@ -192,7 +193,7 @@ public class PaserItemsPaser {
                     for (int j = 0; j < classs.class_data.instance_fields_size; j++) {
                         Header_Items.Header_Class.EncodedField instance_fields = new Header_Items.Header_Class.EncodedField();
                         instance_fields.access_flags = PaserUtil.decodeUleb128(PaserUtil.readUnsignedLeb128());
-                        instance_fields.access_flags_string=PaserUtil.GetFriendlyAccessFlags(instance_fields.access_flags).toString();
+                        instance_fields.access_flags_string = PaserUtil.GetFriendlyAccessFlags(instance_fields.access_flags).toString();
                         instance_fields.filed_idx_diff = PaserUtil.decodeUleb128(PaserUtil.readUnsignedLeb128());
                         classs.class_data.instance_fields.add(instance_fields);
 
@@ -205,7 +206,7 @@ public class PaserItemsPaser {
 
                         direct_methods.method_idx_diff = PaserUtil.decodeUleb128(PaserUtil.readUnsignedLeb128());
                         direct_methods.access_flags = decodeUleb128(PaserUtil.readUnsignedLeb128());
-                        direct_methods.access_flags_string=PaserUtil.GetFriendlyAccessFlags(direct_methods.access_flags).toString();
+                        direct_methods.access_flags_string = PaserUtil.GetFriendlyAccessFlags(direct_methods.access_flags).toString();
                         direct_methods.code_off = decodeUleb128(PaserUtil.readUnsignedLeb128());
                         direct_methods.code = paserCode(direct_methods.code_off);
                         classs.class_data.direct_methods.add(direct_methods);
@@ -219,7 +220,7 @@ public class PaserItemsPaser {
 
                         encodedMethod.method_idx_diff = PaserUtil.decodeUleb128(PaserUtil.readUnsignedLeb128());
                         encodedMethod.access_flags = PaserUtil.decodeUleb128(PaserUtil.readUnsignedLeb128());
-                        encodedMethod.access_flags_string=PaserUtil.GetFriendlyAccessFlags(encodedMethod.access_flags).toString();
+                        encodedMethod.access_flags_string = PaserUtil.GetFriendlyAccessFlags(encodedMethod.access_flags).toString();
                         encodedMethod.code_off = PaserUtil.decodeUleb128(PaserUtil.readUnsignedLeb128());
                         encodedMethod.code = paserCode(encodedMethod.code_off);
 
@@ -257,24 +258,23 @@ public class PaserItemsPaser {
             int op = PaserUtil.byte2int(PaserHaeder.getHeaderInfoByoff2(2));
             code_item.insns.add(op);
 
-            if (i%2==0){
-                Opcode2Smail(op);
-            }
+            code_item.insns_string.add(Opcode2Smail(op));
 
         }
         return code_item;
     }
 
 
-    public static void Opcode2Smail(int opcode){
+    public static String Opcode2Smail(int opcode) {
 
-        for (Opcodes.Opcode op:Opcodes.Opcode.values()) {
-            if (Integer.parseInt(op.toString())==opcode){
+        for (Opcodes.Opcode op : Opcodes.Opcode.values()) {
+            if (Integer.parseInt(op.toString()) == opcode) {
                 String gOpName = Opcodes.gOpNames[op.ordinal()];
-                System.out.println("\n\t"+gOpName);
+                return gOpName+"\n";
             }
         }
 
+        return null;
     }
 
 

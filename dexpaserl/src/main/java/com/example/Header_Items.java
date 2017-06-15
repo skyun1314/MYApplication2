@@ -140,6 +140,7 @@ public class Header_Items {
             public int debug_info_off;
             public int insns_size;
             public List<Integer> insns=new ArrayList<>();
+            public List<String> insns_string=new ArrayList<>();
 
             @Override
             public String toString() {
@@ -151,6 +152,7 @@ public class Header_Items {
                         ", debug_info_off=" + debug_info_off +
                         ", insns_size=" + insns_size +
                         ", insns=" + insns +
+                        ",\n\t insns_string=\n" + insns_string +
                         '}';
             }
         }

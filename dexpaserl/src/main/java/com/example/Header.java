@@ -6,6 +6,7 @@ package com.example;
 
 public class Header {
 
+
     byte[] dex_magic=new byte[8];;
     int checksum;
     byte[]MSHA1=new byte[20];
@@ -29,6 +30,7 @@ public class Header {
     int class_defs_off ;
     int data_size ;
     int data_off;
+
 
     @Override
     public String toString() {
