@@ -33,7 +33,7 @@ public class Header_Items {
 
         @Override
         public String toString() {
-            return "Header_Strings{" +
+            return "\nHeader_Strings{" +
                     "off=" + off +
                     ", str='" + str + '\'' +
                     '}';
@@ -47,7 +47,7 @@ public class Header_Items {
 
         @Override
         public String toString() {
-            return "Header_Proto{" +
+            return "\nHeader_Proto{" +
                     "shorty_idx=" + shorty_idx +
                     ", return_type_idx=" + return_type_idx +
                     ", parameters_off=" + parameters_off +
@@ -62,7 +62,7 @@ public class Header_Items {
 
         @Override
         public String toString() {
-            return "Header_Field{" +
+            return "\nHeader_Field{" +
                     "class_idx='" + class_idx + '\'' +
                     ", type_idx='" + type_idx + '\'' +
                     ", name_idx='" + name_idx + '\'' +
@@ -77,7 +77,7 @@ public class Header_Items {
 
         @Override
         public String toString() {
-            return "Header_Method{" +
+            return "\nHeader_Method{" +
                     "class_idx='" + class_idx + '\'' +
                     ", proto_idx='" + proto_idx + '\'' +
                     ", name_idx='" + name_idx + '\'' +
@@ -95,7 +95,7 @@ public class Header_Items {
 
         @Override
         public String toString() {
-            return "Header_Class{" +
+            return "\nHeader_Class{" +
                     "\n\tclass_idx='" + class_idx + '\'' +
                     ", \n\tACCESS_FLAGS=" + ACCESS_FLAGS +
                     ", \n\tACCESS_FLAGS_string='" + ACCESS_FLAGS_string + '\'' +
@@ -152,7 +152,7 @@ public class Header_Items {
                         ", tries_size=" + tries_size +
                         ", debug_info_off=" + debug_info_off +
                         ", insns_size=" + insns_size +
-                        ", insns=" + insns +
+                        ", \ninsns=" + insns +
                         ",\n\t insns_string=\n" + insns_string +
                         '}'+"\n";
             }
@@ -169,11 +169,11 @@ public class Header_Items {
             @Override
             public String toString() {
                 return "\n\tEncodedMethod{" +
-                        "\n\tmethod_idx_diff=" + method_idx_diff +
-                        ", \n\taccess_flags=" + access_flags +
-                        ", \n\taccess_flags_string=" + access_flags_string +
-                        ", \n\tcode_off=" + code_off +
-                        ", \n\tcode=" + code +
+                        "method_idx_diff=" + method_idx_diff +
+                        ", access_flags=" + access_flags +
+                        ", access_flags_string=" + access_flags_string +
+                        ", code_off=" + code_off +
+                        ", code=" + code +
                         '}';
             }
         }
@@ -192,11 +192,11 @@ public class Header_Items {
 
             @Override
             public String toString() {
-                return "Class_data{" +
-                        "\n\tstatic_fields_size=" + static_fields_size +
-                        ", \n\tinstance_fields_size=" + instance_fields_size +
-                        ", \n\tdirect_methods_size=" + direct_methods_size +
-                        ", \n\tvirtual_methods_size=" + virtual_methods_size +
+                return "\nClass_data{" +
+                        "static_fields_size=" + static_fields_size +
+                        ", instance_fields_size=" + instance_fields_size +
+                        ", direct_methods_size=" + direct_methods_size +
+                        ", virtual_methods_size=" + virtual_methods_size +
                         ", \n\tstatic_fields=" + static_fields +
                         ", \n\tinstance_fields=" + instance_fields +
                         ", \n\tdirect_methods=" + direct_methods +

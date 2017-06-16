@@ -41,9 +41,9 @@ public class PaserItemsPaser {
 
         }
 
-      /*  System.out.println("-----------------------paserStringId-------------------------------");
+        System.out.println("\n\n-----------------------paserStringId-------------------------------");
          System.out.println(header_strings.toString());
-        System.out.println("-----------------------paserStringId-------------------------------");*/
+        System.out.println("-----------------------paserStringId-------------------------------\n\n");
 
     }
 
@@ -57,9 +57,9 @@ public class PaserItemsPaser {
             header_types.add(type);
         }
 
-        // System.out.println("-----------------------paserTypeId-------------------------------");
-        //System.out.println(header_types.toString());
-        //System.out.println("-----------------------paserTypeId-------------------------------");
+        System.out.println("\n\n-----------------------paserTypeId-------------------------------");
+        System.out.println(header_types.toString());
+        System.out.println("-----------------------paserTypeId-------------------------------\n\n");
 
     }
 
@@ -88,9 +88,9 @@ public class PaserItemsPaser {
             header_protos.add(proto);
         }
 
-       /*  System.out.println("-----------------------paserTypeId-------------------------------");
+        System.out.println("\n\n-----------------------paserProtoId-------------------------------");
         System.out.println(header_protos.toString());
-        System.out.println("-----------------------paserTypeId-------------------------------");*/
+        System.out.println("-----------------------paserProtoId-------------------------------\n\n");
 
     }
 
@@ -110,9 +110,9 @@ public class PaserItemsPaser {
             header_field.add(field);
         }
 
-       /*  System.out.println("-----------------------header_protos-------------------------------");
+         System.out.println("\n\n-----------------------paserFieldId-------------------------------");
         System.out.println(header_field.toString());
-        System.out.println("-----------------------header_protos-------------------------------");*/
+        System.out.println("-----------------------paserFieldId-------------------------------\n\n");
 
     }
 
@@ -134,10 +134,10 @@ public class PaserItemsPaser {
             header_method.add(method);
         }
 
-       /*  System.out.println("-----------------------paserMethodId-------------------------------");
+         System.out.println("\n\n-----------------------paserMethodId-------------------------------");
         System.out.println(header_method.toString());
-        System.out.println("-----------------------paserMethodId-------------------------------");
-*/
+        System.out.println("-----------------------paserMethodId-------------------------------\n\n");
+
     }
 
 

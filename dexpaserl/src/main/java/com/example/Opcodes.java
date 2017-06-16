@@ -845,12 +845,18 @@ public class Opcodes {
 
     public static String getOpcode(){
 
+        if (insns_index1>=opcodess.size()){
+            System.out.println("cuole");
+        }
+
 
         String vB = opcodess.get(insns_index1);
         insns_index1++;
         return vB;
     }
     public static int getOpcode(Header_Items.Header_Class.Code_item code_item){
+
+
 
         byte[] bytes = code_item.insns_byte.get(insns_index1);
         insns_index1++;
@@ -1006,9 +1012,9 @@ public class Opcodes {
 
                 s = getOpcode();
                 vA = "v" + s.substring(2, 4);;
-                 s1 = getOpcode();
-                vB = "v" + s.substring(2, 4);;
-                vC = "v" + s.substring(0, 2);;
+                s1 = getOpcode();
+                vB = "v" + s1.substring(2, 4);;
+                vC = "v" + s1.substring(0, 2);;
 
                 haha=vA+", "+vB+", "+vC;
 
@@ -1020,8 +1026,8 @@ public class Opcodes {
 
                 
                  s1 = getOpcode();
-                vB =  s.substring(2, 4);;
-                vC = "v" + s.substring(0, 2);;
+                vB =  s1.substring(2, 4);;
+                vC = "v" + s1.substring(0, 2);;
 
                 haha=vA+", "+vB+", "+vC;
 
@@ -1135,7 +1141,7 @@ public class Opcodes {
 
                 s = getOpcode();
                 vA = "v" + s.substring(3, 4);;
-                vBb = Integer.parseInt(s.substring(2, 3));;
+                vBb = Integer.parseInt(s.substring(2, 3),16);;
 
                 
                 int vCx = getOpcode(code_item);
@@ -1150,7 +1156,7 @@ public class Opcodes {
 
                 switch (vBb){
                     case 5:
-                        haha="{"+vD+","+vE+","+vF+","+vG+","+vA+"},"+PaserItemsPaser.header_types.get(vCx).toString();
+                        haha="{"+vD+","+vE+","+vF+","+vG+","+vA+"},"+PaserItemsPaser.header_method.get(vCx).toString();
                         break;
                     case 4:
                         haha="{"+vD+","+vE+","+vF+","+vG+"},"+PaserItemsPaser.header_method.get(vCx).toString();
@@ -1261,8 +1267,8 @@ public class Opcodes {
                 //op {vCCCC .. vNNNN}, meth@BBBB  ; op {vCCCC .. vNNNN}, type@BBBB
                // (where NNNN = CCCC+AA-1, that is A determines the count 0..255, and C determines the first register)
                 s = getOpcode();
-
-               int vAa= Integer.parseInt(s.substring(2, 4));
+                String substring = s.substring(2, 4);
+                int vAa= Integer.parseInt(substring,16);
                 
                 int vBx = getOpcode(code_item);
 
