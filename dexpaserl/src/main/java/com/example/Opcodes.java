@@ -597,11 +597,15 @@ public class Opcodes {
             "31t",
             "31t",
 
+
+            "23x",
             "23x",
             "23x",
             "23x",
             "23x",
 
+
+            "22t",
             "22t",
             "22t",
             "22t",
@@ -613,12 +617,15 @@ public class Opcodes {
             "21t",
             "21t",
             "21t",
+            "21t",
 
             "10x",
             "10x",
             "10x",
             "10x",
             "10x",
+            "10x",
+
 
             "23x",
             "23x",
@@ -633,6 +640,8 @@ public class Opcodes {
             "23x",
             "23x",
             "23x",
+            "23x",
+
 
             "22c",
             "22c",
@@ -647,6 +656,8 @@ public class Opcodes {
             "22c",
             "22c",
             "22c",
+            "22c",
+
 
             "21c",
             "21c",
@@ -661,73 +672,29 @@ public class Opcodes {
             "21c",
             "21c",
             "21c",
+            "21c",
+
 
             "35c",
             "35c",
             "35c",
             "35c",
+            "35c",
+
 
             "10x",
 
+
             "3rc",
             "3rc",
             "3rc",
             "3rc",
+            "3rc",
+
 
             "10x",
+            "10x",
 
-            "12x",
-            "12x",
-            "12x",
-            "12x",
-            "12x",
-            "12x",
-            "12x",
-            "12x",
-            "12x",
-            "12x",
-            "12x",
-            "12x",
-            "12x",
-            "12x",
-            "12x",
-            "12x",
-            "12x",
-            "12x",
-            "12x",
-            "12x",
-
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
-            "23x",
 
             "12x",
             "12x",
@@ -750,6 +717,64 @@ public class Opcodes {
             "12x",
             "12x",
             "12x",
+
+
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+            "23x",
+
+
+            "12x",
+            "12x",
+            "12x",
+            "12x",
+            "12x",
+            "12x",
+            "12x",
+            "12x",
+            "12x",
+            "12x",
+            "12x",
+            "12x",
+            "12x",
+            "12x",
+            "12x",
+            "12x",
+            "12x",
+            "12x",
+            "12x",
+            "12x",
+            "12x",
+            "12x",
             "12x",
             "12x",
             "12x",
@@ -761,6 +786,8 @@ public class Opcodes {
             "12x",
             "12x",
 
+
+            "22s",
             "22s",
             "22s",
             "22s",
@@ -779,7 +806,10 @@ public class Opcodes {
             "22b",
             "22b",
             "22b",
+            "22b",
 
+
+            "10x",
             "10x",
             "10x",
             "10x",
@@ -816,20 +846,30 @@ public class Opcodes {
     public static String getOpcode(){
 
 
-       String vB = opcodess.get(insns_index1);
+        String vB = opcodess.get(insns_index1);
         insns_index1++;
         return vB;
     }
+    public static int getOpcode(Header_Items.Header_Class.Code_item code_item){
+
+        byte[] bytes = code_item.insns_byte.get(insns_index1);
+        insns_index1++;
+
+
+
+        return PaserUtil.byte2int(bytes);
+    }
+
 
     public static int insns_index1;
     public static List<String> opcodess;
-    public static Map<String, Object> getforFormat(String gOpFormat, String gOpName, List<String> opcodes, int insns_index) {
-
+    public static Map<String, Object> getforFormat(String gOpFormat, String gOpName, Header_Items.Header_Class.Code_item code_item, int insns_index) {
+       // List<String> opcodes;
         Map<String, Object> objectMap = new HashMap<>();
         String s;
         String substring1;
         String substring2;
-        String vB;
+        String vB = "";
         int vBb;
         String vA;
         String vC;
@@ -840,7 +880,7 @@ public class Opcodes {
         String vH;
         String s1;
         insns_index1=insns_index;
-        opcodess=opcodes;
+        opcodess=code_item.insns;
         String haha = "";
         switch (gOpFormat) {
             case "10x"://op    ;   ØØ|op
@@ -948,8 +988,8 @@ public class Opcodes {
                 s = getOpcode();
                 vA = "v" + s.substring(2, 4);;
 
-                vB = getOpcode();
-                vBb=Integer.parseInt(vB,16);
+
+
                 switch (gOpName){
                     case "check-cast":
 
@@ -957,7 +997,7 @@ public class Opcodes {
                     case "const-class":
                         break;
                     case "const-string":
-                        PaserItemsPaser.header_strings.get(vBb);
+                        vB=PaserItemsPaser.header_strings.get(getOpcode(code_item)).str;
                         break;
                 }
 
@@ -1233,7 +1273,7 @@ public class Opcodes {
 
                 
                 vC = getOpcode();
-                int vCc=Integer.parseInt(opcodes.get(insns_index),16);
+                int vCc=Integer.parseInt(opcodess.get(insns_index),16);
                 haha="{"+vC+".."+(vCc+vAa-1)+"},"+vB;
 
 
@@ -1248,7 +1288,7 @@ public class Opcodes {
 
                 
                 vC = getOpcode();
-                int vCcc=Integer.parseInt(opcodes.get(insns_index),16);
+                int vCcc=Integer.parseInt(opcodess.get(insns_index),16);
                 haha="{"+vC+".."+(vCcc+vAaa-1)+"},"+vB;
 
 
@@ -1267,7 +1307,7 @@ public class Opcodes {
 
                 
                 vD = getOpcode();
-              int  vDd = Integer.parseInt(opcodes.get(insns_index),16);
+              int  vDd = Integer.parseInt(opcodess.get(insns_index),16);
 
                 haha="{"+vD+" .. "+(vDd+vAaaa-1)+"},"+vB+","+vC;
 

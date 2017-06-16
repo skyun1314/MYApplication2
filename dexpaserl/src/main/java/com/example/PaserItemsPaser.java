@@ -256,8 +256,10 @@ public class PaserItemsPaser {
         code_item.insns_size = PaserUtil.byte2int(PaserHaeder.getHeaderInfoByoff2(4));
 
         for (int i = 0; i < code_item.insns_size; i++) {
-            String op = PaserUtil.byteArray2String(PaserHaeder.getHeaderInfoByoff2(2));
+            byte[] headerInfoByoff2 = PaserHaeder.getHeaderInfoByoff2(2);
+            String op = PaserUtil.byteArray2String(headerInfoByoff2);
             code_item.insns.add(op);
+            code_item.insns_byte.add(headerInfoByoff2);
         }
 
         Opcode2Smail(code_item);
@@ -280,7 +282,7 @@ public class PaserItemsPaser {
                     String gOpName = Opcodes.gOpNames[op.ordinal()];
                     String gOpFormat = Opcodes.Format[op.ordinal()];
 
-                    Map<String, Object> objectMap = Opcodes.getforFormat(gOpFormat, gOpName, opcodes, insns_index);
+                    Map<String, Object> objectMap = Opcodes.getforFormat(gOpFormat, gOpName, code_item, insns_index);
                     insns_index = (int) objectMap.get("size");
                     String code = (String) objectMap.get("code");
 

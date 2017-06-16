@@ -139,7 +139,8 @@ public class Header_Items {
             public int tries_size;
             public int debug_info_off;
             public int insns_size;
-            public List<Byte> insns=new ArrayList<>();
+            public List<String> insns=new ArrayList<>();
+            public List<byte[]> insns_byte=new ArrayList<>();
             public List<String> insns_string=new ArrayList<>();
 
             @Override
