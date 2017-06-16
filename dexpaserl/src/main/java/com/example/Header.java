@@ -35,29 +35,29 @@ public class Header {
     @Override
     public String toString() {
         return "Header{" +
-                "dex_magic=" + PaserUtil.byteArray2String(dex_magic) +
-                ", checksum=" + checksum +
-                ", MSHA1=" + PaserUtil.byteArray2String(MSHA1) +
-                ", file_size=" + file_size +
-                ", header_size=" + header_size +
-                ", endian_tag=" + Integer.toHexString(endian_tag)  +
-                ", link_size=" + link_size +
-                ", link_off=" + link_off +
-                ", map_off=" + map_off +
-                ", string_ids_size=" + string_ids_size +
-                ", string_ids_off=" + string_ids_off +
-                ", type_ids_size=" + type_ids_size +
-                ", type_ids_off=" + type_ids_off +
-                ", proto_ids_size=" + proto_ids_size +
-                ", proto_ids_off=" + proto_ids_off +
-                ", field_ids_size=" + field_ids_size +
-                ", field_ids_off=" + field_ids_off +
-                ", method_ids_size=" + method_ids_size +
-                ", method_ids_off=" + method_ids_off +
-                ", class_defs_size=" + class_defs_size +
-                ", class_defs_off=" + class_defs_off +
-                ", data_size=" + data_size +
-                ", data_off=" + data_off +
+                "\n\tdex_magic = " + PaserUtil.byteArray2String(dex_magic) +
+                ", \n\tchecksum = " + checksum +
+                ", \n\tMSHA1 = " + PaserUtil.byteArray2String(MSHA1) +
+                ", \n\tfile_size = " + file_size +
+                ", \n\theader_size = " + header_size +
+                ", \n\tendian_tag = " + Integer.toHexString(endian_tag)  +
+                ", \n\tlink_size = " + link_size +
+                ", \n\tlink_off = " + link_off +
+                ", \n\tmap_off = " + map_off +
+                ", \n\tstring_ids_size = " + string_ids_size +
+                ", \n\tstring_ids_off = " + string_ids_off +
+                ", \n\ttype_ids_size = " + type_ids_size +
+                ", \n\ttype_ids_off = " + type_ids_off +
+                ", \n\tproto_ids_size = " + proto_ids_size +
+                ", \n\tproto_ids_off = " + proto_ids_off +
+                ", \n\tfield_ids_size = " + field_ids_size +
+                ", \n\tfield_ids_off = " + field_ids_off +
+                ", \n\tmethod_ids_size = " + method_ids_size +
+                ", \n\tmethod_ids_off = " + method_ids_off +
+                ", \n\tclass_defs_size = " + class_defs_size +
+                ", \n\tclass_defs_off = " + class_defs_off +
+                ", \n\tdata_size = " + data_size +
+                ", \n\tdata_off = " + data_off +
                 '}';
     }
 
