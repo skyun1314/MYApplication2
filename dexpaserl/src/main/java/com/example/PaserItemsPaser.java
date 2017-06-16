@@ -18,6 +18,8 @@ public class PaserItemsPaser {
     public static List<Header_Strings> header_strings;
     public static List<Header_Items.Header_Types> header_types;
     public static List<Header_Items.Header_Proto> header_protos;
+    public static List<Header_Items.Header_Field> header_field;
+    public static List<Header_Items.Header_Method> header_method;
 
     public static void paserStringId() {
         header_strings = new ArrayList<>();
@@ -93,7 +95,7 @@ public class PaserItemsPaser {
     }
 
     public static void paserFieldId() {
-        List<Header_Items.Header_Field> header_field = new ArrayList<>();
+        header_field = new ArrayList<>();
         for (int i = 0; i < PaserHaeder.header.field_ids_size; i++) {
             Header_Items.Header_Field field = new Header_Items.Header_Field();
             int class_idx = PaserUtil.byte2int(PaserHaeder.getHeaderInfoByoff(2));
@@ -116,7 +118,7 @@ public class PaserItemsPaser {
 
 
     public static void paserMethodId() {
-        List<Header_Items.Header_Method> header_method = new ArrayList<>();
+        header_method = new ArrayList<>();
         for (int i = 0; i < PaserHaeder.header.method_ids_size; i++) {
             Header_Items.Header_Method method = new Header_Items.Header_Method();
             int class_idx = PaserUtil.byte2int(PaserHaeder.getHeaderInfoByoff(2));

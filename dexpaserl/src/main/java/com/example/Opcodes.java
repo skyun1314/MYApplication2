@@ -890,8 +890,8 @@ public class Opcodes {
 
 
                 s = getOpcode();
-                vA = "v" + s.substring(2, 3);;
-                vB = "v" + s.substring(3,4);;
+                vB = "v" + s.substring(2, 3);;
+                vA = "v" + s.substring(3,4);;
 
                 haha = vA + ", " + vB;
                 break;
@@ -900,8 +900,8 @@ public class Opcodes {
 
                 s = getOpcode();
 
-                vA = "v" + s.substring(2, 3);;
-                vB = s.substring(3,4);;
+                vB = "v" + s.substring(2, 3);;
+                vA = s.substring(3,4);;
                 haha = vA + ", " + vB;
                 
                 break;
@@ -956,7 +956,7 @@ public class Opcodes {
 
 
                 s = getOpcode();
-                vA = "v" + s.substring(3, 4);;
+                vA = "v" + s.substring(2, 4);;
 
                 
 
@@ -988,17 +988,12 @@ public class Opcodes {
                 s = getOpcode();
                 vA = "v" + s.substring(2, 4);;
 
-
-
-                switch (gOpName){
-                    case "check-cast":
-
-                        break;
-                    case "const-class":
-                        break;
-                    case "const-string":
-                        vB=PaserItemsPaser.header_strings.get(getOpcode(code_item)).str;
-                        break;
+                if (gOpName.contains("sput")||gOpName.contains("sget")){
+                    vB=PaserItemsPaser.header_field.get(getOpcode(code_item)).toString();
+                }else if (gOpName.contains("check-cast")||gOpName.contains("new-instance")||gOpName.contains("const-class")){
+                    vB=PaserItemsPaser.header_types.get(getOpcode(code_item)).toString();
+                }else  if (gOpName.contains("const-string")){
+                    vB=PaserItemsPaser.header_strings.get(getOpcode(code_item)).str;
                 }
 
 
@@ -1012,21 +1007,21 @@ public class Opcodes {
                 s = getOpcode();
                 vA = "v" + s.substring(2, 4);;
                  s1 = getOpcode();
-                vC = "v" + s.substring(2, 4);;
-                vB = "v" + s.substring(0, 2);;
+                vB = "v" + s.substring(2, 4);;
+                vC = "v" + s.substring(0, 2);;
 
                 haha=vA+", "+vB+", "+vC;
 
                 break;
-            case "22b"://op vAA, vBB, #+CC
+            case "22b"://op vAA, vBB, #+CC      ;AA|op CC|BB
 
                 s = getOpcode();
                 vA = "v" + s.substring(2, 4);;
 
                 
                  s1 = getOpcode();
-                vC =  s.substring(2, 4);;
-                vB = "v" + s.substring(0, 2);;
+                vB =  s.substring(2, 4);;
+                vC = "v" + s.substring(0, 2);;
 
                 haha=vA+", "+vB+", "+vC;
 
@@ -1034,8 +1029,8 @@ public class Opcodes {
                 break;
             case "22t"://op vA, vB, +CCCC     :    B|A|op CCCC
                 s = getOpcode();
-                vA = "v" + s.substring(0, 1);;
-                vB = "v" + s.substring(1, 2);;
+                vB = "v" + s.substring(0, 1);;
+                vA = "v" + s.substring(1, 2);;
                 
                 vC = getOpcode();
 
@@ -1045,8 +1040,8 @@ public class Opcodes {
             case "22s"://	op vA, vB, #+CCCC
 
                 s = getOpcode();
-                vA = "v" + s.substring(0, 1);;
-                vB = "v" + s.substring(1, 2);;
+                vB = "v" + s.substring(0, 1);;
+                vA = "v" + s.substring(1, 2);;
                 
                 vC = getOpcode();
 
@@ -1056,8 +1051,8 @@ public class Opcodes {
             case "22c"://op vA, vB, type@CCCC   ;;;  op vA, vB, field@CCCC
 
                 s = getOpcode();
-                vA = "v" + s.substring(0, 1);;
-                vB = "v" + s.substring(1, 2);;
+                vB = "v" + s.substring(0, 1);;
+                vA = "v" + s.substring(1, 2);;
                 
                 vC = getOpcode();
 
@@ -1067,8 +1062,8 @@ public class Opcodes {
             case "22cs"://op vA, vB, fieldoff@CCCC
 
                 s = getOpcode();
-                vA = "v" + s.substring(0, 1);;
-                vB = "v" + s.substring(1, 2);;
+                vB = "v" + s.substring(0, 1);;
+                vA = "v" + s.substring(1, 2);;
                 
                 vC = getOpcode();
 
@@ -1139,38 +1134,38 @@ public class Opcodes {
 [B=0] op {}, kind@CCCC*/
 
                 s = getOpcode();
-                vA = "v" + s.substring(2, 3);;
-                vBb = Integer.parseInt(s.substring(3, 4));;
+                vA = "v" + s.substring(3, 4);;
+                vBb = Integer.parseInt(s.substring(2, 3));;
 
                 
-                vC = getOpcode();
+                int vCx = getOpcode(code_item);
 
                 
                 s = getOpcode();
-                vD = "v" + s.substring(0, 1);;
-                vE = "v" + s.substring(1, 2);;
-                vF = "v" + s.substring(2, 3);;
-                vG = "v" + s.substring(3, 4);;
+                vG = "v" + s.substring(0, 1);;
+                vF = "v" + s.substring(1, 2);;
+                vE = "v" + s.substring(2, 3);;
+                vD = "v" + s.substring(3, 4);;
 
 
                 switch (vBb){
                     case 5:
-                        haha="{"+vD+","+vE+","+vF+","+vG+","+vA+"},"+vC;
+                        haha="{"+vD+","+vE+","+vF+","+vG+","+vA+"},"+PaserItemsPaser.header_types.get(vCx).toString();
                         break;
                     case 4:
-                        haha="{"+vD+","+vE+","+vF+","+vG+"},"+vC;
+                        haha="{"+vD+","+vE+","+vF+","+vG+"},"+PaserItemsPaser.header_method.get(vCx).toString();
                         break;
                     case 3:
-                        haha="{"+vD+","+vE+","+vF+"},"+vC;
+                        haha="{"+vD+","+vE+","+vF+"},"+PaserItemsPaser.header_method.get(vCx).toString();
                         break;
                     case 2:
-                        haha="{"+vD+","+vE+"},"+vC;
+                        haha="{"+vD+","+vE+"},"+PaserItemsPaser.header_method.get(vCx).toString();
                         break;
                     case 1:
-                        haha="{"+vD+"},"+vC;
+                        haha="{"+vD+"},"+PaserItemsPaser.header_method.get(vCx).toString();
                         break;
                     case 0:
-                        haha="{},"+vC;
+                        haha="{},"+PaserItemsPaser.header_method.get(vCx).toString();;
                         break;
                 }
 
@@ -1184,18 +1179,18 @@ public class Opcodes {
 [B=2] op {vD, vE}, vtaboff@CCCC
 [B=1] op {vD}, vtaboff@CCCC*/
                 s = getOpcode();
-                vA = "v" + s.substring(2, 3);;
-                 vBb = Integer.parseInt(s.substring(3, 4));;
+                vA = "v" + s.substring(3, 4);;
+                 vBb = Integer.parseInt(s.substring(2, 3));;
 
                 
                 vC = getOpcode();
 
                 
                 s = getOpcode();
-                vD = "v" + s.substring(0, 1);;
-                vE = "v" + s.substring(1, 2);;
-                vF = "v" + s.substring(2, 3);;
-                vG = "v" + s.substring(3, 4);;
+                vG = "v" + s.substring(0, 1);;
+                vF = "v" + s.substring(1, 2);;
+                vE = "v" + s.substring(2, 3);;
+                vD = "v" + s.substring(3, 4);;
 
 
                 switch (vBb){
@@ -1225,21 +1220,21 @@ public class Opcodes {
 [B=2] op {vE, vF}, vtaboff@CC, iface@DD
 [B=1] op {vE}, vtaboff@CC, iface@DD*/
                 s = getOpcode();
-                vA = "v" + s.substring(2, 3);;
-                 vBb = Integer.parseInt(s.substring(3, 4));;
+                vA = "v" + s.substring(3, 4);;
+                 vBb = Integer.parseInt(s.substring(2, 3));;
 
                 
                 s = getOpcode();
 
-                vC=s.substring(2, 3);
-                vD=s.substring(3, 4);
+                vD=s.substring(0, 2);
+                vC=s.substring(2, 4);
 
                 
                 s = getOpcode();
-                vE = "v" + s.substring(0, 1);;
-                vF = "v" + s.substring(1, 2);;
-                vG = "v" + s.substring(2, 3);;
-                vH = "v" + s.substring(3, 4);;
+                vH = "v" + s.substring(0, 1);;
+                vG = "v" + s.substring(1, 2);;
+                vF = "v" + s.substring(2, 3);;
+                vE = "v" + s.substring(3, 4);;
 
 
                 switch (vBb){
@@ -1267,14 +1262,15 @@ public class Opcodes {
                // (where NNNN = CCCC+AA-1, that is A determines the count 0..255, and C determines the first register)
                 s = getOpcode();
 
-               int vAa= Integer.parseInt(s.substring(2, 3));
+               int vAa= Integer.parseInt(s.substring(2, 4));
                 
-                vB = getOpcode();
+                int vBx = getOpcode(code_item);
 
                 
-                vC = getOpcode();
-                int vCc=Integer.parseInt(opcodess.get(insns_index),16);
-                haha="{"+vC+".."+(vCc+vAa-1)+"},"+vB;
+                int vCxx = getOpcode(code_item);
+
+
+                haha="{v"+vCxx+"..v"+(vCxx+vAa-1)+"},"+vBx;
 
 
                 break;
@@ -1282,14 +1278,15 @@ public class Opcodes {
 
                 s = getOpcode();
 
-                int vAaa= Integer.parseInt(s.substring(2, 3));
-                
-                vB = getOpcode();
+                int vAaa= Integer.parseInt(s.substring(2, 4));
 
-                
-                vC = getOpcode();
-                int vCcc=Integer.parseInt(opcodess.get(insns_index),16);
-                haha="{"+vC+".."+(vCcc+vAaa-1)+"},"+vB;
+                int vBxa = getOpcode(code_item);
+
+
+                int vCxa = getOpcode(code_item);
+
+
+                haha="{v"+vCxa+"..v"+(vCxa+vAaa-1)+"},"+vBxa;
 
 
                 break;
@@ -1305,11 +1302,10 @@ public class Opcodes {
                 vB=s.substring(0,2);
                 vC=s.substring(2,4);
 
-                
-                vD = getOpcode();
-              int  vDd = Integer.parseInt(opcodess.get(insns_index),16);
 
-                haha="{"+vD+" .. "+(vDd+vAaaa-1)+"},"+vB+","+vC;
+                int vDx = getOpcode(code_item);
+
+                haha="{v"+vDx+" .. v"+(vDx+vAaaa-1)+"},"+vB+","+vC;
 
                 break;
             case "51l"://AA|op BBBBlo BBBB BBBB BBBBhi
@@ -1318,17 +1314,17 @@ public class Opcodes {
                 s = getOpcode();
                 vA=s.substring(2,4);
 
-                
-                vB = getOpcode();
 
-                
-                vB+= getOpcode();
+                vBb = getOpcode(code_item);
 
-                
-                vB+= getOpcode();
 
-                
-                vB+= getOpcode();
+                vBb+= getOpcode(code_item);
+
+
+                vBb+= getOpcode(code_item);
+
+
+                vBb+= getOpcode(code_item);
 
                 haha=vA+","+vB;
                 break;
