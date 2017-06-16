@@ -4,6 +4,7 @@ import com.example.Header_Items.Header_Strings;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.example.PaserUtil.bytesToString;
 import static com.example.PaserUtil.decodeUleb128;
@@ -254,25 +255,39 @@ public class PaserItemsPaser {
         code_item.debug_info_off = PaserUtil.byte2int(PaserHaeder.getHeaderInfoByoff2(4));
         code_item.insns_size = PaserUtil.byte2int(PaserHaeder.getHeaderInfoByoff2(4));
 
-        for (int i = 0; i < code_item.insns_size; i++) {
-            int op = PaserUtil.byte2int(PaserHaeder.getHeaderInfoByoff2(2));
+        for (int i = 0; i < code_item.insns_size * 2; i++) {
+            int op = PaserUtil.byte2int(PaserHaeder.getHeaderInfoByoff2(1));
             code_item.insns.add(op);
-
-            code_item.insns_string.add(Opcode2Smail(op));
-
         }
+
+        Opcode2Smail(code_item);
+
         return code_item;
     }
 
 
-    public static String Opcode2Smail(int opcode) {
+    public static Map<String, Object> Opcode2Smail(Header_Items.Header_Class.Code_item code_item) {
+        int insns_index = 0;
 
-        for (Opcodes.Opcode op : Opcodes.Opcode.values()) {
-            if (Integer.parseInt(op.toString()) == opcode) {
-                String gOpName = Opcodes.gOpNames[op.ordinal()];
-                return gOpName+"\n";
+        List<Integer> opcodes=code_item.insns;
+        while (insns_index<opcodes.size()){
+            for (Opcodes.Opcode op : Opcodes.Opcode.values()) {
+                if (Integer.parseInt(op.toString()) == opcodes.get(insns_index)) {
+                    String gOpName = Opcodes.gOpNames[op.ordinal()];
+                    String gOpFormat = Opcodes.Format[op.ordinal()];
+
+                    Map<String, Object> objectMap = Opcodes.getforFormat(gOpFormat, gOpName, opcodes, insns_index);
+                    insns_index = (int) objectMap.get("size");
+                    String code = (String) objectMap.get("code");
+                    code_item.insns_string.add(code);
+                }
             }
+
         }
+
+
+
+
 
         return null;
     }

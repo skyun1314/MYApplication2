@@ -1,5 +1,9 @@
 package com.example;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by zk on 2017/6/15.
  */
@@ -663,7 +667,7 @@ public class Opcodes {
             "35c",
             "35c",
 
-             "10x",
+            "10x",
 
             "3rc",
             "3rc",
@@ -804,15 +808,125 @@ public class Opcodes {
             "10x",
             "10x",
             "10x",
-
-
-
-
 
 
     };
 
+    public static Map<String,Object> getforFormat(String gOpFormat, String gOpName, List<Integer> opcodes, int insns_index) {
+
+        Map<String,Object>objectMap=new HashMap<>();
+
+        String haha = "";
+        switch (gOpFormat) {
+            case "10x"://op
+            break;
+            case "12x"://op vA, vB
+                insns_index++;
+
+                String s = Integer.toHexString(opcodes.get(insns_index));
+
+                String substring1 = s.substring(1);
+                String substring2 = s.substring(1,2);
+
+                String vB = "v" +substring1;
+                String vA = "v" + substring2;
+                haha=    vA + ", " + vB;
+            break;
+            case "11n"://op vA, #+B
+                break;
+            case "11x"://op vAA
+                break;
+            case "10t"://op +AA
+                break;
+            case "20t"://op +AAAA
+                break;
+            case "22x"://op vAA, vBBBB
+                break;
+            case "21t"://op vAA, +BBBB
+                break;
+            case "21s"://op vAA, #+BBBB
+                break;
+            case "21h"://op vAA, #+BBBB0000;;;;//op vAA, #+BBBB000000000000
+                break;
+            case "21c"://op vAA, type@BBBB    ;  op vAA, field@BBBB ; op vAA, string@BBBB
+                break;
+            case "23x"://	op vAA, vBB, vCC
+                break;
+            case "22b"://op vAA, vBB, #+CC
+                break;
+            case "22t"://op vA, vB, +CCCC
+                break;
+            case "22s"://	op vA, vB, #+CCCC
+                break;
+            case "22c"://op vA, vB, type@CCCC   ;;;  op vA, vB, field@CCCC
+                break;
+            case "22cs"://op vA, vB, fieldoff@CCCC
+                break;
+            case "30t"://op +AAAAAAAA
+                break;
+            case "32x"://	op vAAAA, vBBBB
+                break;
+            case "31i"://op vAA, #+BBBBBBBB
+                break;
+
+            case "31t"://	op vAA, +BBBBBBBB
+                break;
+            case "31c"://	op vAA, string@BBBBBBBB
+                break;
+            case "35c":
+
+/*               [B=5] op {vD, vE, vF, vG, vA}, meth@CCCC
+[B=5] op {vD, vE, vF, vG, vA}, type@CCCC
+[B=4] op {vD, vE, vF, vG}, kind@CCCC
+[B=3] op {vD, vE, vF}, kind@CCCC
+[B=2] op {vD, vE}, kind@CCCC
+[B=1] op {vD}, kind@CCCC
+[B=0] op {}, kind@CCCC*/
 
 
+                break;
+            case "35ms":
+
+/*               	[B=5] op {vD, vE, vF, vG, vA}, vtaboff@CCCC
+[B=4] op {vD, vE, vF, vG}, vtaboff@CCCC
+[B=3] op {vD, vE, vF}, vtaboff@CCCC
+[B=2] op {vD, vE}, vtaboff@CCCC
+[B=1] op {vD}, vtaboff@CCCC*/
+
+                break;
+            case "35fs":
+
+/*[B=5] op {vE, vF, vG, vH, vA}, vtaboff@CC, iface@DD
+[B=4] op {vE, vF, vG, vH}, vtaboff@CC, iface@DD
+[B=3] op {vE, vF, vG}, vtaboff@CC, iface@DD
+[B=2] op {vE, vF}, vtaboff@CC, iface@DD
+[B=1] op {vE}, vtaboff@CC, iface@DD*/
+
+                break;
+
+            case "3rc"://op {vCCCC .. vNNNN}, meth@BBBB  ; op {vCCCC .. vNNNN}, type@BBBB
+
+
+                break;
+            case "3rms"://op {vCCCC .. vNNNN}, vtaboff@BBBB
+                break;
+            case "3rfs"://op {vDDDD .. vNNNN}, vtaboff@BB, iface@CC
+
+                break;
+            case "51l"://	op vAA, #+BBBBBBBBBBBBBBBB
+                break;
+
+        }
+        objectMap.put("size",insns_index);
+        objectMap.put("code",gOpName+" "+haha);
+        return objectMap;
+    }
+
+
+    public static void gethaha(String gOpFormat) {
+        int codeOff = gOpFormat.charAt(0) - '0';
+        int regist = gOpFormat.charAt(1) - '0';
+        char c3 = gOpFormat.charAt(2);
+    }
 
 }
