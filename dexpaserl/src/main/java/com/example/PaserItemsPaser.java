@@ -15,9 +15,9 @@ import static com.example.PaserUtil.decodeUleb128;
 
 public class PaserItemsPaser {
 
-    private static List<Header_Strings> header_strings;
-    private static List<Header_Items.Header_Types> header_types;
-    private static List<Header_Items.Header_Proto> header_protos;
+    public static List<Header_Strings> header_strings;
+    public static List<Header_Items.Header_Types> header_types;
+    public static List<Header_Items.Header_Proto> header_protos;
 
     public static void paserStringId() {
         header_strings = new ArrayList<>();

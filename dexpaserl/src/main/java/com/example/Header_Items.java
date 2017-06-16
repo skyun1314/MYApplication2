@@ -96,16 +96,16 @@ public class Header_Items {
         @Override
         public String toString() {
             return "Header_Class{" +
-                    "class_idx='" + class_idx + '\'' +
-                    ", ACCESS_FLAGS=" + ACCESS_FLAGS +
-                    ", ACCESS_FLAGS_string='" + ACCESS_FLAGS_string + '\'' +
-                    ", superclass_idx='" + superclass_idx + '\'' +
-                    ", interfaces_off=" + interfaces_off +
-                    ", source_file_idx='" + source_file_idx + '\'' +
-                    ", annotations_off=" + annotations_off +
-                    ", class_data_off=" + class_data_off +
-                    ", values_off=" + values_off +
-                    ", class_data=" + class_data +
+                    "\n\tclass_idx='" + class_idx + '\'' +
+                    ", \n\tACCESS_FLAGS=" + ACCESS_FLAGS +
+                    ", \n\tACCESS_FLAGS_string='" + ACCESS_FLAGS_string + '\'' +
+                    ", \n\tsuperclass_idx='" + superclass_idx + '\'' +
+                    ", \n\tinterfaces_off=" + interfaces_off +
+                    ", \n\tsource_file_idx='" + source_file_idx + '\'' +
+                    ", \n\tannotations_off=" + annotations_off +
+                    ", \n\tclass_data_off=" + class_data_off +
+                    ", \n\tvalues_off=" + values_off +
+                    ", \n\tclass_data=" + class_data +
                     '}';
         }
 
@@ -139,7 +139,7 @@ public class Header_Items {
             public int tries_size;
             public int debug_info_off;
             public int insns_size;
-            public List<String> insns=new ArrayList<>();
+            public List<Byte> insns=new ArrayList<>();
             public List<String> insns_string=new ArrayList<>();
 
             @Override
@@ -167,12 +167,12 @@ public class Header_Items {
 
             @Override
             public String toString() {
-                return "EncodedMethod{" +
-                        "method_idx_diff=" + method_idx_diff +
-                        ", access_flags=" + access_flags +
-                        ", access_flags_string=" + access_flags_string +
-                        ", code_off=" + code_off +
-                        ", code=" + code +
+                return "\n\tEncodedMethod{" +
+                        "\n\tmethod_idx_diff=" + method_idx_diff +
+                        ", \n\taccess_flags=" + access_flags +
+                        ", \n\taccess_flags_string=" + access_flags_string +
+                        ", \n\tcode_off=" + code_off +
+                        ", \n\tcode=" + code +
                         '}';
             }
         }
@@ -192,14 +192,14 @@ public class Header_Items {
             @Override
             public String toString() {
                 return "Class_data{" +
-                        "static_fields_size=" + static_fields_size +
-                        ", instance_fields_size=" + instance_fields_size +
-                        ", direct_methods_size=" + direct_methods_size +
-                        ", virtual_methods_size=" + virtual_methods_size +
-                        ", \nstatic_fields=" + static_fields +
-                        ", \ninstance_fields=" + instance_fields +
-                        ", \ndirect_methods=" + direct_methods +
-                        ", \nvirtual_methods=" + virtual_methods +
+                        "\n\tstatic_fields_size=" + static_fields_size +
+                        ", \n\tinstance_fields_size=" + instance_fields_size +
+                        ", \n\tdirect_methods_size=" + direct_methods_size +
+                        ", \n\tvirtual_methods_size=" + virtual_methods_size +
+                        ", \n\tstatic_fields=" + static_fields +
+                        ", \n\tinstance_fields=" + instance_fields +
+                        ", \n\tdirect_methods=" + direct_methods +
+                        ", \n\tvirtual_methods=" + virtual_methods +
                         '}';
             }
         }

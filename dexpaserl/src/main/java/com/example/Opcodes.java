@@ -948,9 +948,19 @@ public class Opcodes {
                 s = getOpcode();
                 vA = "v" + s.substring(2, 4);;
 
-                
-
                 vB = getOpcode();
+                vBb=Integer.parseInt(vB,16);
+                switch (gOpName){
+                    case "check-cast":
+
+                        break;
+                    case "const-class":
+                        break;
+                    case "const-string":
+                        PaserItemsPaser.header_strings.get(vBb);
+                        break;
+                }
+
 
 
                 haha = vA + ", " + vB;
