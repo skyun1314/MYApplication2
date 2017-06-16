@@ -812,68 +812,273 @@ public class Opcodes {
 
     };
 
-    public static Map<String,Object> getforFormat(String gOpFormat, String gOpName, List<Integer> opcodes, int insns_index) {
 
-        Map<String,Object>objectMap=new HashMap<>();
+    public static String getOpcode(){
 
+
+       String vB = opcodess.get(insns_index1);
+        insns_index1++;
+        return vB;
+    }
+
+    public static int insns_index1;
+    public static List<String> opcodess;
+    public static Map<String, Object> getforFormat(String gOpFormat, String gOpName, List<String> opcodes, int insns_index) {
+
+        Map<String, Object> objectMap = new HashMap<>();
+        String s;
+        String substring1;
+        String substring2;
+        String vB;
+        int vBb;
+        String vA;
+        String vC;
+        String vD;
+        String vE;
+        String vF;
+        String vG;
+        String vH;
+        String s1;
+        insns_index1=insns_index;
+        opcodess=opcodes;
         String haha = "";
         switch (gOpFormat) {
-            case "10x"://op
-            break;
-            case "12x"://op vA, vB
-                insns_index++;
-
-                String s = Integer.toHexString(opcodes.get(insns_index));
-
-                String substring1 = s.substring(1);
-                String substring2 = s.substring(1,2);
-
-                String vB = "v" +substring1;
-                String vA = "v" + substring2;
-                haha=    vA + ", " + vB;
-            break;
-            case "11n"://op vA, #+B
+            case "10x"://op    ;   ØØ|op
+                insns_index1++;
                 break;
-            case "11x"://op vAA
+            case "12x"://op vA, vB     ;;B|A|op
+
+
+                s = getOpcode();
+                vA = "v" + s.substring(2, 3);;
+                vB = "v" + s.substring(3,4);;
+
+                haha = vA + ", " + vB;
+                break;
+            case "11n"://op vA, #+B      ;
+
+
+                s = getOpcode();
+
+                vA = "v" + s.substring(2, 3);;
+                vB = s.substring(3,4);;
+                haha = vA + ", " + vB;
+                
+                break;
+            case "11x"://op vAA    ;   AA|op
+
+                s = getOpcode();
+
+                vA = "v" + s.substring(2, 4);;
+                haha = vA ;
+                
                 break;
             case "10t"://op +AA
+
+
+                s = getOpcode();
+
+                haha = s.substring(2, 4);;
+                
                 break;
-            case "20t"://op +AAAA
+            case "20t"://op +AAAA     ;    ØØ|op AAAA
+                
+                haha = getOpcode();
+
                 break;
-            case "22x"://op vAA, vBBBB
+            case "22x"://op vAA, vBBBB     ;   AA|op BBBB
+
+                s = getOpcode();
+                vA = "v" + s.substring(2, 4);;
+
+                
+
+                vB = "v" +getOpcode();
+
+
+                haha = vA + ", " + vB;
+
                 break;
             case "21t"://op vAA, +BBBB
+
+                s = getOpcode();
+                vA = "v" + s.substring(2, 4);;
+
+                
+
+                vB = getOpcode();
+
+
+                haha = vA + ", " + vB;
+
                 break;
             case "21s"://op vAA, #+BBBB
+
+
+                s = getOpcode();
+                vA = "v" + s.substring(3, 4);;
+
+                
+
+                vB = getOpcode();
+
+
+                haha = vA + ", " + vB;
+
+
                 break;
-            case "21h"://op vAA, #+BBBB0000;;;;//op vAA, #+BBBB000000000000
+            case "21h"://AA|op BBBB
+                //op vAA, #+BBBB0000;;;;//op vAA, #+BBBB000000000000
+
+
+                s = getOpcode();
+                vA = "v" + s.substring(2, 4);;
+
+                
+
+                vB = "v" +getOpcode();
+
+
+                haha = vA + ", " + vB;
+
+
                 break;
-            case "21c"://op vAA, type@BBBB    ;  op vAA, field@BBBB ; op vAA, string@BBBB
+            case "21c"://AA|op BBBB
+                //op vAA, type@BBBB    ;  op vAA, field@BBBB ; op vAA, string@BBBB
+                s = getOpcode();
+                vA = "v" + s.substring(2, 4);;
+
+                
+
+                vB = getOpcode();
+
+
+                haha = vA + ", " + vB;
+
+
                 break;
-            case "23x"://	op vAA, vBB, vCC
+            case "23x"://	op vAA, vBB, vCC   ;AA|op CC|BB
+
+                s = getOpcode();
+                vA = "v" + s.substring(2, 4);;
+                 s1 = getOpcode();
+                vC = "v" + s.substring(2, 4);;
+                vB = "v" + s.substring(0, 2);;
+
+                haha=vA+", "+vB+", "+vC;
+
                 break;
             case "22b"://op vAA, vBB, #+CC
+
+                s = getOpcode();
+                vA = "v" + s.substring(2, 4);;
+
+                
+                 s1 = getOpcode();
+                vC =  s.substring(2, 4);;
+                vB = "v" + s.substring(0, 2);;
+
+                haha=vA+", "+vB+", "+vC;
+
+
                 break;
-            case "22t"://op vA, vB, +CCCC
+            case "22t"://op vA, vB, +CCCC     :    B|A|op CCCC
+                s = getOpcode();
+                vA = "v" + s.substring(0, 1);;
+                vB = "v" + s.substring(1, 2);;
+                
+                vC = getOpcode();
+
+                haha=vA+", "+vB+", "+vC;
+
                 break;
             case "22s"://	op vA, vB, #+CCCC
+
+                s = getOpcode();
+                vA = "v" + s.substring(0, 1);;
+                vB = "v" + s.substring(1, 2);;
+                
+                vC = getOpcode();
+
+                haha=vA+", "+vB+", "+vC;
+
                 break;
             case "22c"://op vA, vB, type@CCCC   ;;;  op vA, vB, field@CCCC
+
+                s = getOpcode();
+                vA = "v" + s.substring(0, 1);;
+                vB = "v" + s.substring(1, 2);;
+                
+                vC = getOpcode();
+
+                haha=vA+", "+vB+", "+vC;
+
                 break;
             case "22cs"://op vA, vB, fieldoff@CCCC
+
+                s = getOpcode();
+                vA = "v" + s.substring(0, 1);;
+                vB = "v" + s.substring(1, 2);;
+                
+                vC = getOpcode();
+
+                haha=vA+", "+vB+", "+vC;
+
                 break;
-            case "30t"://op +AAAAAAAA
+            case "30t"://op +AAAAAAAA    ;  ØØ|op AAAAlo AAAAhi
+                
+                s = getOpcode();
+                
+                s1 = getOpcode();
+                haha=s+s1;
+
                 break;
-            case "32x"://	op vAAAA, vBBBB
+            case "32x"://	op vAAAA, vBBBB    ;ØØ|op AAAA BBBB
+
+                
+                s = getOpcode();
+                
+                s1 = getOpcode();
+                haha=s+", "+s1;
+
                 break;
-            case "31i"://op vAA, #+BBBBBBBB
+            case "31i"://op vAA, #+BBBBBBBB     ;  AA|op BBBBlo BBBBhi
+                s = getOpcode();
+                vA = "v" + s.substring(2, 4);;
+
+                
+                s = getOpcode();
+                
+                s1 = getOpcode();
+                haha=vA+", "+s+s1;
+
                 break;
 
             case "31t"://	op vAA, +BBBBBBBB
+
+                s = getOpcode();
+                vA = "v" + s.substring(2, 4);;
+
+                
+                s = getOpcode();
+                
+                s1 = getOpcode();
+                haha=vA+", "+s+s1;
+
                 break;
             case "31c"://	op vAA, string@BBBBBBBB
+
+                s = getOpcode();
+                vA = "v" + s.substring(2, 4);;
+
+                
+                s = getOpcode();
+                
+                s1 = getOpcode();
+                haha=vA+", "+s+s1;
+
                 break;
-            case "35c":
+            case "35c":  //B|A|op CCCC G|F|E|D
 
 /*               [B=5] op {vD, vE, vF, vG, vA}, meth@CCCC
 [B=5] op {vD, vE, vF, vG, vA}, type@CCCC
@@ -883,42 +1088,204 @@ public class Opcodes {
 [B=1] op {vD}, kind@CCCC
 [B=0] op {}, kind@CCCC*/
 
+                s = getOpcode();
+                vA = "v" + s.substring(2, 3);;
+                vBb = Integer.parseInt(s.substring(3, 4));;
+
+                
+                vC = getOpcode();
+
+                
+                s = getOpcode();
+                vD = "v" + s.substring(0, 1);;
+                vE = "v" + s.substring(1, 2);;
+                vF = "v" + s.substring(2, 3);;
+                vG = "v" + s.substring(3, 4);;
+
+
+                switch (vBb){
+                    case 5:
+                        haha="{"+vD+","+vE+","+vF+","+vG+","+vA+"},"+vC;
+                        break;
+                    case 4:
+                        haha="{"+vD+","+vE+","+vF+","+vG+"},"+vC;
+                        break;
+                    case 3:
+                        haha="{"+vD+","+vE+","+vF+"},"+vC;
+                        break;
+                    case 2:
+                        haha="{"+vD+","+vE+"},"+vC;
+                        break;
+                    case 1:
+                        haha="{"+vD+"},"+vC;
+                        break;
+                    case 0:
+                        haha="{},"+vC;
+                        break;
+                }
+
 
                 break;
-            case "35ms":
+            case "35ms":  //B|A|op CCCC G|F|E|D
 
 /*               	[B=5] op {vD, vE, vF, vG, vA}, vtaboff@CCCC
 [B=4] op {vD, vE, vF, vG}, vtaboff@CCCC
 [B=3] op {vD, vE, vF}, vtaboff@CCCC
 [B=2] op {vD, vE}, vtaboff@CCCC
 [B=1] op {vD}, vtaboff@CCCC*/
+                s = getOpcode();
+                vA = "v" + s.substring(2, 3);;
+                 vBb = Integer.parseInt(s.substring(3, 4));;
 
+                
+                vC = getOpcode();
+
+                
+                s = getOpcode();
+                vD = "v" + s.substring(0, 1);;
+                vE = "v" + s.substring(1, 2);;
+                vF = "v" + s.substring(2, 3);;
+                vG = "v" + s.substring(3, 4);;
+
+
+                switch (vBb){
+                    case 5:
+                        haha="{"+vD+","+vE+","+vF+","+vG+","+vA+"},"+vC;
+                        break;
+                    case 4:
+                        haha="{"+vD+","+vE+","+vF+","+vG+"},"+vC;
+                        break;
+                    case 3:
+                        haha="{"+vD+","+vE+","+vF+"},"+vC;
+                        break;
+                    case 2:
+                        haha="{"+vD+","+vE+"},"+vC;
+                        break;
+                    case 1:
+                        haha="{"+vD+"},"+vC;
+                        break;
+
+                }
                 break;
-            case "35fs":
+            case "35fs":   //B|A|op DDCC H|G|F|E
 
 /*[B=5] op {vE, vF, vG, vH, vA}, vtaboff@CC, iface@DD
 [B=4] op {vE, vF, vG, vH}, vtaboff@CC, iface@DD
 [B=3] op {vE, vF, vG}, vtaboff@CC, iface@DD
 [B=2] op {vE, vF}, vtaboff@CC, iface@DD
 [B=1] op {vE}, vtaboff@CC, iface@DD*/
+                s = getOpcode();
+                vA = "v" + s.substring(2, 3);;
+                 vBb = Integer.parseInt(s.substring(3, 4));;
 
+                
+                s = getOpcode();
+
+                vC=s.substring(2, 3);
+                vD=s.substring(3, 4);
+
+                
+                s = getOpcode();
+                vE = "v" + s.substring(0, 1);;
+                vF = "v" + s.substring(1, 2);;
+                vG = "v" + s.substring(2, 3);;
+                vH = "v" + s.substring(3, 4);;
+
+
+                switch (vBb){
+                    case 5:
+                        haha="{"+vE+","+vF+","+vG+","+vH+","+vA+"},"+vC+", "+vD;
+                        break;
+                    case 4:
+                        haha="{"+vE+","+vF+","+vG+","+vH+"},"+vC+", "+vD;
+                        break;
+                    case 3:
+                        haha="{"+vE+","+vF+","+vG+"},"+vC+", "+vD;
+                        break;
+                    case 2:
+                        haha="{"+vE+","+vF+"},"+vC+", "+vD;
+                        break;
+                    case 1:
+                        haha="{"+vE+"},"+vC+", "+vD;
+                        break;
+
+                }
                 break;
 
-            case "3rc"://op {vCCCC .. vNNNN}, meth@BBBB  ; op {vCCCC .. vNNNN}, type@BBBB
+            case "3rc"://AA|op BBBB CCCC
+                //op {vCCCC .. vNNNN}, meth@BBBB  ; op {vCCCC .. vNNNN}, type@BBBB
+               // (where NNNN = CCCC+AA-1, that is A determines the count 0..255, and C determines the first register)
+                s = getOpcode();
+
+               int vAa= Integer.parseInt(s.substring(2, 3));
+                
+                vB = getOpcode();
+
+                
+                vC = getOpcode();
+                int vCc=Integer.parseInt(opcodes.get(insns_index),16);
+                haha="{"+vC+".."+(vCc+vAa-1)+"},"+vB;
 
 
                 break;
             case "3rms"://op {vCCCC .. vNNNN}, vtaboff@BBBB
-                break;
-            case "3rfs"://op {vDDDD .. vNNNN}, vtaboff@BB, iface@CC
+
+                s = getOpcode();
+
+                int vAaa= Integer.parseInt(s.substring(2, 3));
+                
+                vB = getOpcode();
+
+                
+                vC = getOpcode();
+                int vCcc=Integer.parseInt(opcodes.get(insns_index),16);
+                haha="{"+vC+".."+(vCcc+vAaa-1)+"},"+vB;
+
 
                 break;
-            case "51l"://	op vAA, #+BBBBBBBBBBBBBBBB
+            case "3rfs"://AA|op CCBB DDDD
+                //op {vDDDD .. vNNNN}, vtaboff@BB, iface@CC
+                //(where NNNN = DDDD+AA-1, that is A determines the count 0..255, and D determines the first register)
+
+                s = getOpcode();
+                vA=s.substring(3,4);
+                int vAaaa= Integer.parseInt(vA);
+                
+                s = getOpcode();
+                vB=s.substring(0,2);
+                vC=s.substring(2,4);
+
+                
+                vD = getOpcode();
+              int  vDd = Integer.parseInt(opcodes.get(insns_index),16);
+
+                haha="{"+vD+" .. "+(vDd+vAaaa-1)+"},"+vB+","+vC;
+
+                break;
+            case "51l"://AA|op BBBBlo BBBB BBBB BBBBhi
+                //	op vAA, #+BBBBBBBBBBBBBBBB
+
+                s = getOpcode();
+                vA=s.substring(2,4);
+
+                
+                vB = getOpcode();
+
+                
+                vB+= getOpcode();
+
+                
+                vB+= getOpcode();
+
+                
+                vB+= getOpcode();
+
+                haha=vA+","+vB;
                 break;
 
         }
-        objectMap.put("size",insns_index);
-        objectMap.put("code",gOpName+" "+haha);
+        objectMap.put("size", insns_index1);
+        objectMap.put("code", gOpName + " " + haha);
         return objectMap;
     }
 

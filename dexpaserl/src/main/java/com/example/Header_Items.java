@@ -139,12 +139,12 @@ public class Header_Items {
             public int tries_size;
             public int debug_info_off;
             public int insns_size;
-            public List<Integer> insns=new ArrayList<>();
+            public List<String> insns=new ArrayList<>();
             public List<String> insns_string=new ArrayList<>();
 
             @Override
             public String toString() {
-                return "Code_item{" +
+                return "\nCode_item{" +
                         "registers_size=" + registers_size +
                         ", ins_size=" + ins_size +
                         ", outs_size=" + outs_size +
@@ -153,7 +153,7 @@ public class Header_Items {
                         ", insns_size=" + insns_size +
                         ", insns=" + insns +
                         ",\n\t insns_string=\n" + insns_string +
-                        '}';
+                        '}'+"\n";
             }
         }
 
