@@ -4,12 +4,15 @@ package com.example.zk.myapplication;
  * Created by zk on 2017/6/10.
  */
 
+import android.content.pm.ApplicationInfo;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import com.saurik.substrate.MS;
 
 import java.lang.reflect.Method;
 
+import dalvik.system.DexFile;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
@@ -19,7 +22,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class Main implements IXposedHookLoadPackage {
 
-    static void initialize(){
+    static void initialize() {
         // 1. hook 对应的类
         MS.hookClassLoad("android.content.res.Resources", new MS.ClassLoadHook() {
             @Override
@@ -34,7 +37,7 @@ public class Main implements IXposedHookLoadPackage {
                     e.printStackTrace();
                 }
 
-                if (getColor == null){
+                if (getColor == null) {
                     return;
                 }
 
@@ -53,18 +56,26 @@ public class Main implements IXposedHookLoadPackage {
         });
 
 
-
     }
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
-        hook1(loadPackageParam);
+       /* hook1(loadPackageParam);
         hook2(loadPackageParam);
+        hook3(loadPackageParam);
+        hook4(loadPackageParam);*/
+
+       // HookLogin.HookImp(loadPackageParam);
+        //HookSettings.HookImp(loadPackageParam);
+        hookCookie.hookCookie(loadPackageParam);
+
+
     }
+
     private void hook1(XC_LoadPackage.LoadPackageParam loadPackageParam) {
         // 判断是否是要Hook的包名
         String packageName = loadPackageParam.packageName;
-        if (!packageName.equals("com.bluelesson.testphoneinfo")){
+        if (!packageName.equals("com.bluelesson.testphoneinfo")) {
             return;
         }
         XposedBridge.log("可以 hook了");
@@ -77,10 +88,126 @@ public class Main implements IXposedHookLoadPackage {
         });
     }
 
+
+    private void hook4(XC_LoadPackage.LoadPackageParam loadPackageParam) {
+        // 判断是否是要Hook的包名
+        final String packageName = loadPackageParam.packageName;
+
+        XposedBridge.log("可以 hook openDexFileNative了");
+        // 可以Hook了
+        XposedHelpers.findAndHookMethod(DexFile.class, "openDexFileNative",String.class, String.class, int.class, new XC_MethodHook() {
+
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+
+            }
+
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                super.afterHookedMethod(param);
+                Object result = param.getResult();
+
+
+                long[]aaa=(long[])result;
+                for (int i = 0; i < aaa.length; i++) {
+                    Log.e("wodelog",packageName+"-----------openDexFileNative---------------"+aaa[i]);
+                }
+
+            }
+        });
+
+    }
+
+
+
+
+    private void hook3(XC_LoadPackage.LoadPackageParam loadPackageParam) {
+        // 判断是否是要Hook的包名
+
+
+        /*
+        ActivityThread activityThread;
+        ApplicationInfo aInfo;
+        CompatibilityInfo compatInfo;
+        ActivityThread mainThread;
+        ClassLoader baseLoader
+        boolean securityViolation;
+        boolean includeCode*/
+      /*  android.app.ActivityThread;
+
+        android.content.pm.ApplicationInfo;
+        android.content.res.CompatibilityInfo;
+        java.lang.ClassLoader;
+        boolean;
+        boolean
+*/
+
+        String packageName = loadPackageParam.packageName;
+        if (!packageName.equals("com.example.nativedex")) {
+            return;
+        }
+        Class ActivityThread = XposedHelpers.findClass("android.app.ActivityThread", loadPackageParam.classLoader);
+        Class CompatibilityInfo = XposedHelpers.findClass("android.content.res.CompatibilityInfo", loadPackageParam.classLoader);
+        Class LoadedApk = XposedHelpers.findClass("android.app.LoadedApk", loadPackageParam.classLoader);
+        Class Configuration = XposedHelpers.findClass("android.content.res.Configuration", loadPackageParam.classLoader);
+
+        XposedBridge.log("可以 hook了");
+        // 可以Hook了
+        XposedHelpers.findAndHookConstructor("android.app.LoadedApk", loadPackageParam.classLoader,
+                ActivityThread, ApplicationInfo.class, CompatibilityInfo, ClassLoader.class, boolean.class, boolean.class,
+
+
+                new XC_MethodHook() {
+
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        super.beforeHookedMethod(param);
+                        XposedBridge.log("我搞不出啦啊1");
+                        XposedBridge.log("arg2:" + param.args[1]);
+                    }
+
+
+                });
+
+
+        XposedHelpers.findAndHookConstructor("android.app.LoadedApk", loadPackageParam.classLoader,
+                ActivityThread,
+
+
+                new XC_MethodHook() {
+
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        super.beforeHookedMethod(param);
+                        XposedBridge.log("我搞不出啦啊2");
+                        XposedBridge.log("arg2:" + param.args[0]);
+                    }
+
+
+                });
+
+        XposedHelpers.findAndHookMethod("android.app.ActivityThread", loadPackageParam.classLoader,"getTopLevelResources"
+                ,String.class,int.class,Configuration,LoadedApk,
+
+
+                new XC_MethodHook() {
+
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        super.beforeHookedMethod(param);
+                        XposedBridge.log("我搞不出啦啊3");
+                        XposedBridge.log("arg2:" + param.args[0]);
+                        XposedBridge.log("arg2:" + param.args[1]);
+                        XposedBridge.log("arg2:" + param.args[2]);
+                        XposedBridge.log("arg2:" + param.args[3]);
+                    }
+
+
+                });
+    }
+
     private void hook2(XC_LoadPackage.LoadPackageParam loadPackageParam) {
         // 判断是否是要Hook的包名
         String packageName = loadPackageParam.packageName;
-        if (!packageName.equals("com15pb.crackme02")){
+        if (!packageName.equals("com15pb.crackme02")) {
             return;
         }
         XposedBridge.log("可以 hook了");

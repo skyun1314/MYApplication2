@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/MYApplication2.iml" filepath="$PROJECT_DIR$/MYApplication2.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/dexpaserl/dexpaserl.iml" filepath="$PROJECT_DIR$/dexpaserl/dexpaserl.iml" />
       <module fileurl="file://$PROJECT_DIR$/haha/haha.iml" filepath="$PROJECT_DIR$/haha/haha.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hook和解析dex.iml" filepath="$PROJECT_DIR$/hook和解析dex.iml" />
     </modules>
   </component>
 </project>

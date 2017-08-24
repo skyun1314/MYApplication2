@@ -7,9 +7,9 @@ package com.example;
 public class Header {
 
 
-    byte[] dex_magic=new byte[8];;
-    int checksum;
-    byte[]MSHA1=new byte[20];
+    byte[] dex_magic;
+    byte[] checksum;
+    byte[]MSHA1;
     int file_size;
     int header_size ;
     int endian_tag ;
@@ -36,7 +36,7 @@ public class Header {
     public String toString() {
         return "Header{" +
                 "\n\tdex_magic = " + PaserUtil.byteArray2String(dex_magic) +
-                ", \n\tchecksum = " + checksum +
+                ", \n\tchecksum = " +  PaserUtil.byteArray2String(checksum) +
                 ", \n\tMSHA1 = " + PaserUtil.byteArray2String(MSHA1) +
                 ", \n\tfile_size = " + file_size +
                 ", \n\theader_size = " + header_size +

@@ -13,7 +13,7 @@ import static com.example.PaserUtil.byte2int;
 
 public class PaserHaeder {
     public static int DexFileBytesIndex = 0;
-    public static byte DexFileBytes[] = readDexFile("/Users/zk/Downloads/haha-debug/classes.dex");
+    public static byte DexFileBytes[] = readDexFile("/Users/zk/Downloads/工具-文档和源码/HelloWorld/classes.dex");
     public static Header header;
     public static int DexFileBytesIndex2 = 0;
 
@@ -104,7 +104,7 @@ public class PaserHaeder {
 
 
         header.dex_magic = dex_magic;
-        header.checksum = byte2int(checksum);
+        header.checksum = checksum;
         header.MSHA1 = MSHA1;
 
         header.file_size = byte2int(file_size);
