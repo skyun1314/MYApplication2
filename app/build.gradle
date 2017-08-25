@@ -46,4 +46,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile files('src/main/libs/substrate-api.jar')
     provided files('src/main/lib/XposedBridge-82.jar')
+    compile files('src/main/libs/dom4j-2.0.1.jar')
 }

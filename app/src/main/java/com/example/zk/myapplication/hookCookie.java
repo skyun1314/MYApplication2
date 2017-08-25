@@ -4,6 +4,9 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -20,7 +23,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class hookCookie {
 
-    public static void replaceClassLoader(Context context, String my_packageName) {
+    public static void replaceClassLoader(String my_packageName, ClassLoader classLoader) {
         try {
             Class<?> aClass = Class.forName("android.app.ActivityThread");
             Class<?> aClass1 = Class.forName("android.app.LoadedApk");
@@ -31,13 +34,13 @@ public class hookCookie {
             Field mPackages = aClass.getDeclaredField("mPackages");
             mPackages.setAccessible(true);
             Map map = (Map) mPackages.get(currentActivityThread);
-            WeakReference o = (WeakReference) map.get(context.getPackageName());
+            WeakReference o = (WeakReference) map.get(my_packageName);
             Object loadedapk = o.get();
             Field mClassLoader = aClass1.getDeclaredField("mClassLoader");
             mClassLoader.setAccessible(true);
 
 
-            Object classLoader = mClassLoader.get(loadedapk);
+            // Object classLoader = mClassLoader.get(loadedapk);
             Class clzBaseDexClassLoader = Class.forName("dalvik.system.BaseDexClassLoader");
             Class clzDexPathList = Class.forName("dalvik.system.DexPathList");
             Field field_pathList = clzBaseDexClassLoader.getDeclaredField("pathList");
@@ -50,10 +53,10 @@ public class hookCookie {
 
             //int cookie=MmClassLoader.getcookie();
             int length = Array.getLength(dexElemennts);
-
+            Log.e("wodelog", "dexElemennts_lenth: " + length);
             for (int i = 0; i < length; i++) {
                 Object ele = Array.get(dexElemennts, i);
-
+                Log.e("wodelog", "dexElemennt[" + i + "]" + ele);
                 try {
                     Field field_dexFile = clzElement.getDeclaredField("dexFile");
                     field_dexFile.setAccessible(true);
@@ -64,14 +67,13 @@ public class hookCookie {
                     field_mcookie.setAccessible(true);
                     //field_mcookie.set(dexFile, mCookie);
                     int o1 = (int) field_mcookie.get(dexFile);
-                    Log.e("wodelog","o1---- "+o1);
-                    XposedBridge.log("cookie: "+o1);
-
-                    MainActivity.aaattachBaseContext(o1,my_packageName);
+                    //  XposedBridge.log("cookie: "+o1);
+                    Log.e("wodelog", "cookie: " + o1);
+                    MainActivity.aaattachBaseContext(o1, my_packageName);
                 } catch (Exception e) {
+                    Log.e("wodelog", "Exception: " + e.toString());
                     e.printStackTrace();
                 }
-                break;
             }
 
 
@@ -84,9 +86,37 @@ public class hookCookie {
         // 判断是否是要Hook的包名
         final String packageName = lpparam.packageName;
 
+        StringBuffer sb = null;
+        try {
+            File file = new File("/sdcard/tuoke.txt");
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String readline = "";
+            sb = new StringBuffer();
+            while ((readline = br.readLine()) != null) {
+                System.out.println("readline:" + readline);
+                sb.append(readline);
+            }
+            br.close();
+            System.out.println("读取成功：" + sb.toString());
+        } catch (Exception e) {
 
-       // final String my_packageName="com.example.haha";
-        final String  my_packageName="com.zxjw.superinstaller";
+            e.printStackTrace();
+
+        }
+
+        if (sb == null) {
+            return;
+        }
+
+        String result = sb.toString();
+
+
+        String[] split = result.split("::");
+
+
+        final String my_packageName = split[0];
+        final String protect_Application = split[1];
+        final String Main_Activity = split[2];
 
         /*XposedHelpers.findAndHookMethod("android.app.Activity", lpparam.classLoader, "finish", new XC_MethodReplacement() {
 
@@ -98,24 +128,47 @@ public class hookCookie {
         });*/
 
         // 可以Hook了
-        if(packageName.equals(my_packageName)){
+        if (packageName.equals(my_packageName)) {
             XposedBridge.log("可以 hook cookie");
 
 
+           /* try {
+                XposedHelpers.findAndHookMethod(protect_Application, lpparam.classLoader, "onCreate",  new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
 
+                        ClassLoader xx= (ClassLoader) XposedHelpers.getObjectField(param.thisObject,"cl");
+                        Context context = (Context) param.thisObject;
+                        XposedBridge.log("我拿到ClassLoader了");
+                        ishasClassLoader[0] =true;
+                        final ClassLoader classLoader =context.getClassLoader();
+                        XposedHelpers.findAndHookMethod(Main_Activity, classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
+                            @Override
+                            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                                XposedBridge.log("我进入真正的onCreate了1");
+                                replaceClassLoader(my_packageName,classLoader);
 
-            XposedHelpers.findAndHookMethod("com.bangcle.protect.ApplicationWrapper", lpparam.classLoader, "onCreate",  new XC_MethodHook() {
+                            }
+                        });
+
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }*/
+
+            XposedHelpers.findAndHookMethod("android.content.ContextWrapper", lpparam.classLoader, "attachBaseContext", Context.class, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    XposedBridge.log("我进入父类attachBaseContext了");
+                    Context context = (Context) param.args[0];
 
-                    ClassLoader xx= (ClassLoader) XposedHelpers.getObjectField(param.thisObject,"cl");
-                    Context context = (Context) param.thisObject;
-
-                    ClassLoader classLoader =context.getClassLoader();
-                    XposedHelpers.findAndHookMethod("com.zxjw.superinstaller.ui.InstallActivity", classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
+                    final ClassLoader finalClassLoader = context.getClassLoader();
+                    XposedHelpers.findAndHookMethod(Main_Activity, finalClassLoader, "onCreate", Bundle.class, new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                            replaceClassLoader((Context) param.thisObject,my_packageName);
+                            XposedBridge.log("我进入真正的onCreate了：" + Main_Activity);
+                            replaceClassLoader(my_packageName, finalClassLoader);
 
                         }
                     });
@@ -124,22 +177,12 @@ public class hookCookie {
             });
 
 
-/*
-
-            XposedHelpers.findAndHookMethod("com.example.haha.MainActivity", lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    replaceClassLoader((Context) param.thisObject,my_packageName);
-
-                }
-            });
-*/
-
-
         }
 
     }
+
     static {
         System.load("/data/data/com.example.zk.myapplication/lib/libzkjg-lib.so");
     }
+
 }
