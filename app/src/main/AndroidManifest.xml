@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.zk.myapplication">
+    package="com.dexpaser.zk.myapplication">
     <uses-permission android:name="cydia.permission.SUBSTRATE"></uses-permission>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <application
@@ -10,7 +10,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name="com.dexpaser.zk.myapplication.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

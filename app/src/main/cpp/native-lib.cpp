@@ -8,23 +8,27 @@
 #include <android/log.h>
 #include <sys/types.h>
 #include <unistd.h>
-
+#include<vector>
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
-static char szPathxx[100]={0};
+#include<cstring>
+
+using namespace std;
+DexHeader *dexHeader;
+static char szPathxx[100] = {0};
 #define LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,"wodelog", __VA_ARGS__)
 extern "C" {
-
+void printDexHeader(JNIEnv *env, DexFile *pDexFile);
 void data(DexFile *pDexFile, MemMapping *mem);
-void printDexHeader(DexFile *pDexFile);
+
 JNIEXPORT void JNICALL
-haha(JNIEnv *env, jobject instance, jint cookie,jstring pact) {
+haha(JNIEnv *env, jobject instance, jint cookie, jstring pact) {
 
 
-    if(cookie==0||cookie==NULL){
-        LOGD( "无效输入");
+    if (cookie == 0 || cookie == NULL) {
+        LOGD("无效输入");
         return;
     }
 
@@ -39,34 +43,35 @@ haha(JNIEnv *env, jobject instance, jint cookie,jstring pact) {
     }
     DexFile *dexFile = pDvmDex->pDexFile;
     MemMapping mapping = pDvmDex->memMap;
-    LOGD( "MemMapping:filename:%s  addr:%x length:%x baseAddr:%x baseLength:%x",pDexOrJar->fileName, mapping.addr,  mapping.length, mapping.baseAddr, mapping.baseLength);
+    LOGD("MemMapping:filename:%s  addr:%x length:%x baseAddr:%x baseLength:%x", pDexOrJar->fileName,
+         mapping.addr, mapping.length, mapping.baseAddr, mapping.baseLength);
 
 
-   /* for (int i = 0; i < mapping.length; ++i) {
-        LOGD("%x", mapping.addr[i]);
-    }*/
+    /* for (int i = 0; i < mapping.length; ++i) {
+         LOGD("%x", mapping.addr[i]);
+     }*/
 
-    size_t dlen=mapping.length*6.5;//保存三倍dex文件长度
+    size_t dlen = mapping.length * 2.5;//base64以后肯定会变长
 
-    unsigned char *dst=(unsigned char*)malloc(dlen);
+    unsigned char *dst = (unsigned char *) malloc(dlen);
 
-    base64_encode(dst, &dlen, (const unsigned char *) mapping.addr, mapping.length*3);
-
-
-   char* mPackageName = (char *) env->GetStringUTFChars(pact, 0);
+    base64_encode(dst, &dlen, (const unsigned char *) mapping.addr, mapping.length);//保存三倍dex文件长度
 
 
-    sprintf(szPathxx, "/data/data/%s/cache/hahahahaha%d", mPackageName,cookie);
-    LOGD( "创建文件：%s",szPathxx);
+    char *mPackageName = (char *) env->GetStringUTFChars(pact, 0);
 
-    FILE* file= fopen(szPathxx,"wb+");
+
+    sprintf(szPathxx, "/data/data/%s/cache/hahahahaha%d", mPackageName, cookie);
+    LOGD("创建文件：%s", szPathxx);
+
+    FILE *file = fopen(szPathxx, "wb+");
     //  fwrite(mapping.addr,mapping.length*3,1,file);//保存三倍dex文件长度
-   fwrite(dst, dlen, 1, file);
-
+    fwrite(dst, dlen, 1, file);
+    fclose(file);
 
     //data(dexFile,&mapping);
-    printDexHeader(dexFile);
-    fclose(file);
+    printDexHeader(env, dexFile);
+
 }
 
 
@@ -88,7 +93,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (vm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK) {
         return result;
     }
-    jclass jclass1 = env->FindClass("com/example/zk/myapplication/MainActivity");
+    jclass jclass1 = env->FindClass("com/dexpaser/zk/myapplication/MainActivity");
     int ret = env->RegisterNatives(jclass1, method, 1);
 
     if (ret < 0) {
@@ -98,43 +103,629 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
 }
 
-void data(DexFile *pDexFile, MemMapping *mem){
-    /*char * temp=new char[100];
-    strcpy(temp,szPathxx);
-    strcat(temp,"part1");
+void data(DexFile *pDexFile, MemMapping *mem) {
+    char *temp = new char[100];
+    strcpy(temp, szPathxx);
+    strcat(temp, "part1");
     FILE *fp = fopen(temp, "wb+");
-    const u1 *addr = (const u1*)mem->addr;
-    int length=int(pDexFile->baseAddr+pDexFile->pHeader->classDefsOff-addr);
-    fwrite(addr,1,length,fp);
+    const u1 *addr = (const u1 *) mem->addr;
+    int length = int(pDexFile->baseAddr + pDexFile->pHeader->classDefsOff - addr);
+    fwrite(addr, 1, length, fp);
     fflush(fp);
     fclose(fp);
 
-    strcpy(temp,szPathxx);
-    strcat(temp,"data");
+    strcpy(temp, szPathxx);
+    strcat(temp, "data");
     fp = fopen(temp, "wb+");
-    addr = pDexFile->baseAddr+pDexFile->pHeader->classDefsOff+sizeof(DexClassDef)*pDexFile->pHeader->classDefsSize;
-    length=int((const u1*)mem->addr+mem->length-addr);
-    fwrite(addr,1,length,fp);
+    addr = pDexFile->baseAddr + pDexFile->pHeader->classDefsOff +
+           sizeof(DexClassDef) * pDexFile->pHeader->classDefsSize;
+    length = int((const u1 *) mem->addr + mem->length - addr);
+    fwrite(addr, 1, length, fp);
     fflush(fp);
     fclose(fp);
-    delete temp;*/
+    delete temp;
+
+}
 
 
+int readunsignedleb128(const u1 **pStream) {
+    const u1 *ptr = *pStream;
+    int result = *(ptr++);
+    if (result > 0x7f) {
+        int cur = *(ptr++);
+        result = (result & 0x7f) | ((cur & 0x7f) << 7);
+        if (cur > 0x7f) {
+            cur = *(ptr++);
+            result |= (cur & 0x7f) << 14;
+            if (cur > 0x7f) {
+                cur = *(ptr++);
+                result |= (cur & 0x7f) << 21;
+                if (cur > 0x7f) {
+                    cur = *(ptr++);
+                    result |= cur << 28;
+                }
+            }
+        }
+    }
+    *pStream = ptr;
+    return result;
+}
+
+
+class CodeItem {
+
+
+    int register_size = 0;
+    int ins_size = 0;
+    int outs_size = 0;
+    int tries_size = 0;
+    //int tries[];
+    int debug_info_off = 0;
+    int insns_size = 0;
+    vector<u2> insns;
+
+public:
+
+
+    void dump(const u1 *addr) {
+
+
+        memcpy(&register_size, addr, 2);
+        memcpy(&ins_size, addr += 2, 2);
+        memcpy(&outs_size, addr += 2, 2);
+        memcpy(&tries_size, addr += 2, 2);
+        memcpy(&debug_info_off, addr += 2, 4);
+        memcpy(&insns_size, addr += 4, 4);
+
+        addr += 4;
+
+        LOGD("---------------Code_start--------------------");
+
+        for (int i = 0; i < insns_size; ++i) {
+            u2 xx;
+            memcpy(&xx, (const void *) addr, 2);
+            LOGD("%x",xx);
+            insns.push_back(xx);
+            addr += 2;
+        }
+
+        LOGD("----------------Code_end-------------------");
+
+        /*
+        if (tries_size != 0 and insns_size % 2 == 1) {
+        }
+
+        for (int i = 0; i < tries_size; ++i) {
+           *//* TryItem tryitem = TryItem();
+            tryitem.dump(addr + len + 8 * i);
+            tries.append(tryitem);*//*
+        }
+        if (tries_size != 0) {
+           *//* EncodedhandlerList handler = EncodedhandlerList();
+            handler.dump((const u1 **) (addr + len));
+            len += handler.len;*//*
+        }*/
+    }
+};
+
+
+class Encodedfield {
+public:
+    int field_idx_diff = 0;
+    int access_flags = 0;
+
+    void dump(const u1 **addr) {
+        field_idx_diff = readunsignedleb128(addr);
+        access_flags = readunsignedleb128(addr);
+    }
+
+};
+
+class Encodedmethod {
+public:
+    int method_idx_diff = 0;
+    int access_flags = 0;
+    int code_off = 0;
+
+    void dump(const u1 **addr) {
+        method_idx_diff = readunsignedleb128(addr);
+        access_flags = readunsignedleb128(addr);
+        code_off = readunsignedleb128(addr);
+        int code_addr = code_off + (long) dexHeader;
+        CodeItem codeItem;
+      //  int *pcode_addr = &code_addr;
+        codeItem.dump((const u1 *) code_addr);
+    }
+
+};
+
+
+class ClassdataItem {
+public:
+    int static_field_size = 0;
+    int instance_fields_size = 0;
+    int direct_methods_size = 0;
+    int virtual_methods_size = 0;
+    vector<Encodedfield> static_fields;
+    vector<Encodedfield> instance_fields;
+    vector<Encodedmethod> direct_methods;
+    vector<Encodedmethod> virtual_methods;
+
+
+    void dump(const u1 **addr) {
+
+        static_field_size = readunsignedleb128(addr);
+        instance_fields_size = readunsignedleb128(addr);
+        direct_methods_size = readunsignedleb128(addr);
+        virtual_methods_size = readunsignedleb128(addr);
+
+        for (int i = 0; i < static_field_size; ++i) {
+            Encodedfield encodedfield;
+            encodedfield.dump(addr);
+            static_fields.push_back(encodedfield);
+        }
+
+        for (int i = 0; i < instance_fields_size; ++i) {
+            Encodedfield encodedfield;
+            encodedfield.dump(addr);
+            instance_fields.push_back(encodedfield);
+        }
+
+        for (int i = 0; i < direct_methods_size; ++i) {
+
+            Encodedmethod encodedfield;
+            encodedfield.dump(addr);
+            direct_methods.push_back(encodedfield);
+        }
+
+
+        for (int i = 0; i < virtual_methods_size; ++i) {
+            Encodedmethod encodedfield;
+            encodedfield.dump(addr);
+            virtual_methods.push_back(encodedfield);
+        }
+
+
+    }
+
+
+};
+
+
+void printDexHeader(JNIEnv *env, DexFile *pDexFile) {
+    dexHeader = (DexHeader *) pDexFile->pHeader;
+    LOGD("string off;%d", dexHeader->stringIdsOff);
+    LOGD("type off;%d", dexHeader->typeIdsOff);
+    LOGD("proto off;%d", dexHeader->protoIdsOff);
+    LOGD("field off;%d", dexHeader->fieldIdsOff);
+    LOGD("method off;%d", dexHeader->methodIdsOff);
+    LOGD("classdef off;%d", dexHeader->classDefsOff);
+    LOGD("classdef size:%d", dexHeader->classDefsSize);
+
+
+    int classDate_addr = pDexFile->pClassDefs->classDataOff + (long) dexHeader;
+
+    int *pClassDate_addr = &classDate_addr;
+
+    for (int i = 0; i <dexHeader->classDefsSize ; ++i) {
+        ClassdataItem classdataItem;
+
+        classdataItem.dump((const u1 **) pClassDate_addr);
+    }
 
 
 
 
 }
 
-void printDexHeader(DexFile *pDexFile){
-    DexHeader*haha= (DexHeader *) pDexFile->pHeader;
-    LOGD( "string off%d", haha->stringIdsOff);
-            LOGD( "type off%d",haha->typeIdsOff);
-            LOGD( "proto off%d", haha->protoIdsOff);
-            LOGD( "field off%d", haha->fieldIdsOff);
-            LOGD( "method off%d", haha->methodIdsOff);
-            LOGD( "classdef off%d", haha->classDefsOff);
-            LOGD( "classdef size:%d", haha->classDefsSize);
+
+
+/*
+
+*/
+/*方法三，调用C库函数,*//*
+
+char *join3(char *s1, char *s2) {
+    char *result = (char *) malloc(strlen(s1) + strlen(s2) + 1);//+1 for the zero-terminator
+    //in real code you would check for errors in malloc here
+    if (result == NULL) exit(1);
+
+    strcpy(result, s1);
+    strcat(result, s2);
+
+    return result;
 }
+
+
+
+
+string slashtodot(string str) {//#change '/' to '.'
+
+
+    while (str.find("@") != -1) {
+        str = str.replace(str.find("/"), 1, ".");
+    }
+
+    return str;
+}
+
+
+string dexGetStringData(DexFile dexfile, u4 offset) {
+    u4 addr = (u4) (dexfile.baseAddr + offset);
+    while (Byte(addr) > 0x7f) { //# skip uleb len
+        addr += 1;
+    }
+    addr += 1;
+    char *str = "";
+    Byte one = Byte(addr);
+    while (one != 0) {
+        str += (char) one;
+        addr += 1;
+        one = Byte(addr);
+    }
+
+    return str;
+
+
+}
+
+
+u4 dexGetStringId(DexFile dexfile, u4 idx) {
+    return (u4) (dexfile.pStringIds + 4 * idx);
+}
+
+
+string dexStringById(DexFile dexfile, u4 idx) {
+    u4 offset = dexGetStringId(dexfile, idx);
+    return dexGetStringData(dexfile, offset);
+}
+u4 dexGetTypeId(DexFile dexfile, u4 idx) {
+    return (u4) (dexfile.pTypeIds + 4 * idx);
+}
+
+
+string dexStringByTypeIdx(DexFile dexfile, u4 idx) {
+    return dexStringById(dexfile, dexGetTypeId(dexfile, idx));
+}
+
+
+string dexGetClassDescriptor(DexFile dexfile, DexClassDef classdef) {
+    return dexStringByTypeIdx(dexfile, classdef.classIdx);
+}
+
+
+u1 *writeunsignedleb128(u1 *ptr, u4 data) {
+
+    while (true) { //循环
+
+        u1 out = data & 0x7f;; //跟7F进行与运算 得出最后7位
+
+        if (out != data) {
+
+            *ptr++ = out | 0x80; //80就等于10000000 也就是跟前面补1
+
+            data >>= 7;// 继续下个7个字节
+
+        } else {
+
+            *ptr++ = out;
+            break;
+
+        }
+
+    }
+
+    return ptr;
+
+}
+
+
+
+
+
+class TryItem {
+    int start = 0;
+    int len = 8;
+    int start_addr = 0;
+    int insn_count = 0;
+    int handler_off = 0;
+
+
+    int copytofile(int file) {
+        int wlen = 0;
+        file.write( struct.pack("I", start_addr));
+        file.write( struct.pack("H", insn_count));
+        file.write( struct.pack("H", handler_off));
+        wlen += 4 + 2 + 2;
+        return wlen;
+    }
+
+public:
+    void dump(int addr) {
+        start = addr;
+        start_addr = (addr);
+        insn_count = (addr + 4);
+        handler_off = (addr + 6);
+    }
+};
+
+
+class EncodedTypeAddrPair {
+    int type_idx = 0;
+    int addr = 0;
+
+
+    int copytofile(u4 file) {
+        int wlen = 0;
+        wlen += (int) writeunsignedleb128((u1 *) type_idx, file);
+        wlen += (int) writeunsignedleb128((u1 *) addr, file);
+        return wlen;
+    }
+
+public:
+    void dump(int ddr) {
+        int type_idx, length = readunsignedleb128((const u1 **) addr);
+        len += length;
+        addr, length = readunsignedleb128((const u1 **) (addr + length));
+        len += length;
+    }
+
+    int len = 0;
+};
+
+
+class EncodedhandlerItem {
+    int start = 0;
+    int size = 0;
+    int handlers[];
+    int catch_all_addr = 0;
+
+
+    int copytofile(int file) {
+        int wlen = 0;
+        wlen += (int)writeunsignedleb128((u1 *) size, file);
+
+        for (int i = 0; i < abs(size); ++i) {
+            wlen += handlers[i].copytofile(file);
+        }
+
+
+        if (size <= 0) {//:
+            wlen += (int) writeunsignedleb128((u1 *) catch_all_addr, file);
+        }
+
+        return wlen;
+    }
+
+public:
+    void dump(int addr) {
+        start = addr;
+       int size, length = readunsignedleb128((const u1 **) addr);
+        len += length;
+
+        for (int i = 0; i < abs(size); ++i) {
+            EncodedTypeAddrPair pair = EncodedTypeAddrPair();
+            pair.dump(addr + len);
+            len += pair.len;
+            handlers.append(pair);
+        }
+
+
+        if (size <= 0) {
+            int catch_all_addr, length = readunsignedleb128((const u1 **) (addr + len));
+            len += length;
+        }
+
+    }
+
+    int len = 0;
+};
+
+
+class EncodedhandlerList {
+    int start = 0;
+    int size = 0;
+    int list[];
+
+
+    int copytofile(int file) {
+        int wlen = 0;
+        wlen += (int) writeunsignedleb128((u1 *) size, file);
+
+        for (int i = 0; i < size; ++i) {
+            wlen += list[i].copytofile(file);
+        }
+
+
+        return wlen;
+    }
+
+
+public:
+    void dump(const u1 **addr) {
+        start = (int) addr;
+        int size, length = readunsignedleb128(addr);
+        len += length;
+
+        for (int i = 0; i < size; ++i) {
+            EncodedhandlerItem handler = EncodedhandlerItem();
+            handler.dump((int) (addr + len));
+            len += handler.len;
+            list.append(handler);
+        }
+
+
+    }
+
+    int len = 0;
+};
+
+
+
+
+
+
+
+void copytofile(char *dump_dir, DexFile dexFile) {
+    DexHeader *pDexHeader = (DexHeader *) dexFile.pHeader;
+    FILE *classfile = fopen(join3(dump_dir, "classdef"), "wb+");
+    FILE *extra = fopen(join3(dump_dir, "extra"), "wb+");
+    FILE *logger = fopen(join3(dump_dir, "log.txt"), "w");
+
+    u4 num_class_def = pDexHeader->classDefsSize;
+    u4 total_point = pDexHeader->dataOff + pDexHeader->dataSize;
+    u4 start = pDexHeader->dataOff;
+    u4 end = total_point;
+    while (total_point & 3) { //#Align 4
+        total_point += 1;
+    }
+
+    LOGD("num class def:%d", num_class_def);
+    for (int i = 0; i < num_class_def; ++i) {
+        LOGD("cur class:%d,Total:%d", i, num_class_def);
+        DexClassDef classdef = DexClassDef();
+        DexClassDef_dump((int) (dexFile.pClassDefs + 32 * i), classdef);
+        string descriptor = dexGetClassDescriptor(dexFile, classdef);
+        bool need_extra = false;
+        bool need_pass = false;
+        string tmp = slashtodot(descriptor);
+//# if descriptor.startswith("Landroid") or classdef.classDataOff == 0:        #skip class Landroid... anyway it can't be used...
+//#     need_pass = True
+//#     print "des:", tmp, "is passed"
+        if (classdef.classDataOff == 0) {        //#skip class Landroid...
+            bool need_pass = true;
+            LOGD("des:%s is passed", tmp);
+
+        } else {
+            LOGD("des %s", tmp);
+
+            if (classdef.classDataOff < start || classdef.classDataOff > end) {
+                bool need_extra = true;
+            }
+
+            ClassdataItem classdata = ClassdataItem();
+            classdata.dump((const u1 **) (dexFile.baseAddr + classdef.classDataOff));
+            if (classdata.direct_methods_size) {
+
+                for (int j = 0; j < classdata.direct_methods_size; ++j) {
+                    method = classdata.direct_methods[j];
+                    if (method.code_off == 0) {
+                        continue;
+                    }
+                    if (method.access_flags & 0x100) {// # native func or ..
+                        need_extra = true;
+                        method.code_off = 0;
+                        continue;
+                    }
+
+                    if (method.code_off < start or method.code_off > end) {
+                        need_extra = true;
+                        CodeItem codeitem = CodeItem();
+                        codeitem.dump(int(self.baseAddr + method.code_off));
+//#writefile(extra, int(self.baseAddr+method.code_off), codeitem.len)
+                        wlen = codeitem.copytofile((int) extra);
+                        method.code_off = total_point;
+//# total_point += codeitem.len
+                        total_point += wlen;
+                        while (total_point & 3) {
+                            extra.write(
+                            struct.pack("B", 0));
+                            total_point += 1;
+                        }
+
+                    }
+
+
+                }
+
+
+            }
+
+            if (classdata.virtual_methods_size) {
+
+                for (int j = 0; j < classdata.virtual_methods_size; ++j) {
+                    method = classdata.virtual_methods[j];
+                    if (method.code_off == 0) {
+                        continue;
+                    }
+                    if (method.access_flags & 0x100) {//:     # native  func or ..
+                        need_extra = true;
+                        method.code_off = 0;
+                        continue;
+                    }
+
+                    if (method.code_off < start or method.code_off > end) {//:
+                        need_extra = true;
+                        CodeItem codeitem = CodeItem();
+                        codeitem.dump(int(self.baseAddr + method.code_off));
+//# writefile(extra, int(self.baseAddr+method.code_off), codeitem.len)
+                        wlen = codeitem.copytofile(extra);
+                        method.code_off = total_point;
+                        total_point += wlen;
+//# total_point += codeitem.len
+                        while (total_point & 3) {//:
+                            extra.write(
+                            struct.pack("B", 0));
+                            total_point += 1;
+                        }
+                    }
+                }
+
+
+            }
+        }
+
+
+        if (need_extra) {
+            classdef.classDataOff = total_point;
+            wlen = classdata.copytofile(extra);
+            total_point += wlen;
+            while (total_point & 3) {//:
+                extra.write(
+                struct.pack("B", 0));
+                total_point += 1;
+            }
+
+            classdef.copytofile(classfile);
+            if (self.pOptHeader != 0) {
+                LOGD("dump OptHeader");
+
+                optdex = self.pOptHeader + self.OptHeader.depsOffset;        //    #get  opt table
+                writefile(extra, optdex, self.OptHeader.optOffset - self.OptHeader.depsOffset +
+                                         self.OptHeader.optLength);
+                self.OptHeader.optOffset =
+                        total_point + self.OptHeader.optOffset - self.OptHeader.depsOffset + 40;
+                self.OptHeader.depsOffset = total_point + 40;
+            }
+
+        }
+
+        extra.close();
+        classfile.close();
+        logger.close();
+
+        self.saveHeaderandData();
+        whole = open(dump_dir + "whole.dex", "wb+");
+        with
+                open(dump_dir + "header", "rb");
+        as header:
+        whole.writelines(header.readlines());
+        with
+                open(dump_dir + "classdef", "rb");
+        as classfile:
+        whole.writelines(classfile.readlines());
+        with
+                open(dump_dir + "data", "rb");
+        as data:
+        whole.writelines(data.readlines());
+        with
+                open(dump_dir + "extra", "rb");
+        as extra:
+        whole.writelines(extra.readlines())
+        whole.close()
+        print("DONE")
+    }
+
+*/
 
 }

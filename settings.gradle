@@ -1,1 +1,1 @@
-include ':app', ':haha', ':dexpaserl'
+include ':app', ':haha', ':dexpaserl', ':dexpasermode'
