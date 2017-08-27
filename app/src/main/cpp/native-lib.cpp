@@ -14,14 +14,25 @@
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 #include<cstring>
-
+#include <pthread.h>　
 using namespace std;
 DexHeader *dexHeader;
 static char szPathxx[100] = {0};
 #define LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,"wodelog", __VA_ARGS__)
 extern "C" {
-void printDexHeader(JNIEnv *env, DexFile *pDexFile);
+void printDexHeader(DexFile *pDexFile);
 void data(DexFile *pDexFile, MemMapping *mem);
+
+
+pthread_t mThread;
+void *AlertThreadStub(void *lparam);
+
+
+
+void *AlertThreadStub(void *lparam) {
+    printDexHeader((DexFile *) lparam);
+}
+
 
 JNIEXPORT void JNICALL
 haha(JNIEnv *env, jobject instance, jint cookie, jstring pact) {
@@ -46,31 +57,32 @@ haha(JNIEnv *env, jobject instance, jint cookie, jstring pact) {
     LOGD("MemMapping:filename:%s  addr:%x length:%x baseAddr:%x baseLength:%x", pDexOrJar->fileName,
          mapping.addr, mapping.length, mapping.baseAddr, mapping.baseLength);
 
+    LOGD("dexLength_dexlen:%d", dexFile->pOptHeader->dexLength);
 
-    /* for (int i = 0; i < mapping.length; ++i) {
-         LOGD("%x", mapping.addr[i]);
-     }*/
+   pthread_create(&mThread, NULL, AlertThreadStub, dexFile);
 
-    size_t dlen = mapping.length * 2.5;//base64以后肯定会变长
+
+   // printDexHeader(env, dexFile);
+
+
+    /*size_t dlen = mapping.length * 2.5;//base64以后肯定会变长
 
     unsigned char *dst = (unsigned char *) malloc(dlen);
 
     base64_encode(dst, &dlen, (const unsigned char *) mapping.addr, mapping.length);//保存三倍dex文件长度
 
-
     char *mPackageName = (char *) env->GetStringUTFChars(pact, 0);
 
 
-    sprintf(szPathxx, "/data/data/%s/cache/hahahahaha%d", mPackageName, cookie);
+    sprintf(szPathxx, "/data/data/%s/cache/hahahahaha%d", mPackageName, mapping.length);
     LOGD("创建文件：%s", szPathxx);
 
     FILE *file = fopen(szPathxx, "wb+");
-    //  fwrite(mapping.addr,mapping.length*3,1,file);//保存三倍dex文件长度
-    fwrite(dst, dlen, 1, file);
-    fclose(file);
+    //fwrite(mapping.addr, mapping.length, 1, file);//保存三倍dex文件长度
+     fwrite(dst, dlen, 1, file);
+    fclose(file);*/
 
     //data(dexFile,&mapping);
-    printDexHeader(env, dexFile);
 
 }
 
@@ -85,8 +97,12 @@ static JNINativeMethod method[] = {
 };
 
 
-jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
+
+
+
+
+jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     JNIEnv *env = NULL;
     jint result = -1;
@@ -184,7 +200,7 @@ public:
         for (int i = 0; i < insns_size; ++i) {
             u2 xx;
             memcpy(&xx, (const void *) addr, 2);
-            LOGD("%x",xx);
+            LOGD("%x", xx);
             insns.push_back(xx);
             addr += 2;
         }
@@ -233,7 +249,12 @@ public:
         code_off = readunsignedleb128(addr);
         int code_addr = code_off + (long) dexHeader;
         CodeItem codeItem;
-      //  int *pcode_addr = &code_addr;
+        LOGD("函数名字--（%d）-----函数偏移(%d)-----------文件偏移(%d)",method_idx_diff,code_off,dexHeader->fileSize);
+
+        if (code_off>dexHeader->fileSize){
+            LOGD("函数偏移大于文件偏移(%d)需要修复",code_off-dexHeader->fileSize);
+        }
+
         codeItem.dump((const u1 *) code_addr);
     }
 
@@ -292,7 +313,7 @@ public:
 };
 
 
-void printDexHeader(JNIEnv *env, DexFile *pDexFile) {
+void printDexHeader(DexFile *pDexFile) {
     dexHeader = (DexHeader *) pDexFile->pHeader;
     LOGD("string off;%d", dexHeader->stringIdsOff);
     LOGD("type off;%d", dexHeader->typeIdsOff);
@@ -302,18 +323,33 @@ void printDexHeader(JNIEnv *env, DexFile *pDexFile) {
     LOGD("classdef off;%d", dexHeader->classDefsOff);
     LOGD("classdef size:%d", dexHeader->classDefsSize);
 
+    LOGD("这个dex一共有 %d 个类", dexHeader->classDefsSize);
+
+
+    if(dexHeader->classDefsSize==1){
+        LOGD("这个dex类太少。不解析");
+
+        return;
+    }
+
+
+    LOGD("类偏移(%d)-------文件偏移(%d)",dexHeader->classDefsOff,dexHeader->fileSize);
+    if (dexHeader->classDefsOff>dexHeader->fileSize){
+        LOGD("类偏移大于文件偏移(%d)需要修复",dexHeader->classDefsOff-dexHeader->fileSize);
+    }
+
+
 
     int classDate_addr = pDexFile->pClassDefs->classDataOff + (long) dexHeader;
 
     int *pClassDate_addr = &classDate_addr;
 
-    for (int i = 0; i <dexHeader->classDefsSize ; ++i) {
+    for (int i = 0; i < dexHeader->classDefsSize; ++i) {
         ClassdataItem classdataItem;
-
+        LOGD("------------------------类（%d）开始", i);
         classdataItem.dump((const u1 **) pClassDate_addr);
+        LOGD("------------------------类(%d)结束", i);
     }
-
-
 
 
 }
