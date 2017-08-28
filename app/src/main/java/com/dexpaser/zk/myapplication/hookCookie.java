@@ -73,9 +73,13 @@ public class hookCookie {
                     //  XposedBridge.log("cookie: "+o1);
                     Log.e("wodelog", "cookie: " + mCookie);
 
-
+                   /* new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            MainActivity.aaattachBaseContext(mCookie, my_packageName);
+                        }
+                    }).start();;*/
                     MainActivity.aaattachBaseContext(mCookie, my_packageName);
-
                 } catch (Exception e) {
                     Log.e("wodelog", "Exception: " + e.toString());
                     e.printStackTrace();
@@ -105,9 +109,7 @@ public class hookCookie {
             br.close();
             System.out.println("读取成功：" + sb.toString());
         } catch (Exception e) {
-
-            e.printStackTrace();
-
+            Log.e("wodelog","文件读取失败");
         }
 
         if (sb == null) {

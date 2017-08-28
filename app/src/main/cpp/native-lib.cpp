@@ -15,6 +15,8 @@
 #include <android/asset_manager_jni.h>
 #include<cstring>
 #include <pthread.h>　
+
+MemMapping mappingxx;
 using namespace std;
 DexHeader *dexHeader;
 static char szPathxx[100] = {0};
@@ -22,22 +24,54 @@ static char szPathxx[100] = {0};
 extern "C" {
 void printDexHeader(DexFile *pDexFile);
 void data(DexFile *pDexFile, MemMapping *mem);
+char *mPackageName;
+FILE dump_opcode;
+FILE class_defs;
+FILE class_data;
+FILE fppart1;
+FILE fp_data;
+FILE dump_whole;
+FILE hahahahah;
 
 
 pthread_t mThread;
 void *AlertThreadStub(void *lparam);
 
 
-
 void *AlertThreadStub(void *lparam) {
     printDexHeader((DexFile *) lparam);
+    //__android_log_print(ANDROID_LOG_INFO, "wodelog", "#Thread working#%lu", mThread);
+    return 0;
+}
+
+
+void makeFile(FILE *xx, char *filename) {
+    memset(szPathxx, 0, 100);
+    sprintf(szPathxx, "/data/data/%s/cache/%s", mPackageName, filename);
+    LOGD("创建文件：%s", szPathxx);
+    FILE *xxx = fopen(szPathxx, "ab+");
+    *xx = *xxx;
+}
+
+
+void writeFile(char *str) {
+    memset(szPathxx, 0, 100);
+    sprintf(szPathxx, "/data/data/%s/cache/%s", mPackageName, str);
+    FILE *xx = fopen(szPathxx, "rb");
+    fseek(xx, 0, SEEK_END);
+    long file_len = ftell(xx);
+    char *buf = (char *) malloc(file_len);
+    fseek(xx, 0, SEEK_SET);
+    /*read the data and display it*/
+    fread(buf, 1, file_len, xx);
+    fwrite(buf, 1, file_len, &dump_whole);
 }
 
 
 JNIEXPORT void JNICALL
 haha(JNIEnv *env, jobject instance, jint cookie, jstring pact) {
 
-
+    mPackageName = (char *) env->GetStringUTFChars(pact, 0);
     if (cookie == 0 || cookie == NULL) {
         LOGD("无效输入");
         return;
@@ -54,15 +88,28 @@ haha(JNIEnv *env, jobject instance, jint cookie, jstring pact) {
     }
     DexFile *dexFile = pDvmDex->pDexFile;
     MemMapping mapping = pDvmDex->memMap;
+    mappingxx = mapping;
     LOGD("MemMapping:filename:%s  addr:%x length:%x baseAddr:%x baseLength:%x", pDexOrJar->fileName,
          mapping.addr, mapping.length, mapping.baseAddr, mapping.baseLength);
 
     LOGD("dexLength_dexlen:%d", dexFile->pOptHeader->dexLength);
 
-   pthread_create(&mThread, NULL, AlertThreadStub, dexFile);
+
+    data(dexFile, &mapping);
+
+    makeFile(&dump_whole, "dump_whole");
+    makeFile(&dump_opcode, "dump_opcode");
+    makeFile(&class_data, "class_data");
+    makeFile(&class_defs, "class_defs");
 
 
-   // printDexHeader(env, dexFile);
+    makeFile(&hahahahah, "hahahahah");
+    fwrite(mapping.addr, mapping.length, 1, &hahahahah);
+    fclose(&hahahahah);
+    //保存三倍dex文件长度
+    //printDexHeader(dexFile);
+    pthread_create(&mThread, NULL, AlertThreadStub, dexFile);
+
 
 
     /*size_t dlen = mapping.length * 2.5;//base64以后肯定会变长
@@ -71,7 +118,7 @@ haha(JNIEnv *env, jobject instance, jint cookie, jstring pact) {
 
     base64_encode(dst, &dlen, (const unsigned char *) mapping.addr, mapping.length);//保存三倍dex文件长度
 
-    char *mPackageName = (char *) env->GetStringUTFChars(pact, 0);
+
 
 
     sprintf(szPathxx, "/data/data/%s/cache/hahahahaha%d", mPackageName, mapping.length);
@@ -82,7 +129,7 @@ haha(JNIEnv *env, jobject instance, jint cookie, jstring pact) {
      fwrite(dst, dlen, 1, file);
     fclose(file);*/
 
-    //data(dexFile,&mapping);
+
 
 }
 
@@ -95,11 +142,6 @@ static JNINativeMethod method[] = {
         }
 
 };
-
-
-
-
-
 
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
@@ -120,29 +162,62 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 }
 
 void data(DexFile *pDexFile, MemMapping *mem) {
-    char *temp = new char[100];
-    strcpy(temp, szPathxx);
-    strcat(temp, "part1");
-    FILE *fp = fopen(temp, "wb+");
-    const u1 *addr = (const u1 *) mem->addr;
-    int length = int(pDexFile->baseAddr + pDexFile->pHeader->classDefsOff - addr);
-    fwrite(addr, 1, length, fp);
-    fflush(fp);
-    fclose(fp);
+    /* char *temp = new char[100];
+     strcpy(temp, szPathxx);
+     strcat(temp, "part1");
+     FILE *fppart11 = fopen(temp, "wb+");*/
 
-    strcpy(temp, szPathxx);
-    strcat(temp, "data");
-    fp = fopen(temp, "wb+");
+
+    makeFile(&fppart1, "part1");
+
+
+    const u1 *addr = (const u1 *) mem->addr;
+    //int length = int(pDexFile->baseAddr + pDexFile->pHeader->classDefsOff - addr);
+    int length = (pDexFile->pHeader->classDefsOff + sizeof(DexOptHeader));
+    fwrite(addr, 1, length, &fppart1);
+    fflush(&fppart1);
+    fclose(&fppart1);
+
+    /* strcpy(temp, szPathxx);
+     strcat(temp, "data");
+     fp_data = *fopen(temp, "wb+");*/
+
+    makeFile(&fp_data, "data");
+
     addr = pDexFile->baseAddr + pDexFile->pHeader->classDefsOff +
-           sizeof(DexClassDef) * pDexFile->pHeader->classDefsSize;
+           (sizeof(DexClassDef) * pDexFile->pHeader->classDefsSize);
+    // length = int((const u1 *) mem->addr + mem->length - addr);
     length = int((const u1 *) mem->addr + mem->length - addr);
-    fwrite(addr, 1, length, fp);
-    fflush(fp);
-    fclose(fp);
-    delete temp;
+    fwrite(addr, 1, length, &fp_data);
+    fflush(&fp_data);
+    fclose(&fp_data);
 
 }
+u1 *writeunsignedleb128(u1 *ptr, u4 data) {
 
+    while (true) { //循环
+
+        u1 out = data & 0x7f;; //跟7F进行与运算 得出最后7位
+
+        if (out != data) {
+
+            *ptr++ = out | 0x80; //80就等于10000000 也就是跟前面补1
+            fwrite(ptr-1, sizeof(u1), 1, &class_data);
+            data >>= 7;// 继续下个7个字节
+
+        } else {
+
+            *ptr++ = out;
+            fwrite(ptr-1, sizeof(u1), 1, &class_data);
+            break;
+
+        }
+
+    }
+
+    return ptr;
+
+}
 
 int readunsignedleb128(const u1 **pStream) {
     const u1 *ptr = *pStream;
@@ -178,7 +253,7 @@ class CodeItem {
     //int tries[];
     int debug_info_off = 0;
     int insns_size = 0;
-    vector<u2> insns;
+    // vector<u2> insns;
 
 public:
 
@@ -192,18 +267,31 @@ public:
         memcpy(&tries_size, addr += 2, 2);
         memcpy(&debug_info_off, addr += 2, 4);
         memcpy(&insns_size, addr += 4, 4);
-
         addr += 4;
 
         LOGD("---------------Code_start--------------------");
 
+        /* for (int i = 0; i < insns_size; ++i) {
+             u2 xx;
+             memcpy(&xx, (const void *) addr, 2);
+             LOGD("%x", xx);
+             insns.push_back(xx);
+             addr += 2;
+         }*/
+
+        int insns_len = sizeof(char) * 2 * insns_size;
+
+        char *insns = (char *) malloc(insns_len);
+        memset(insns, 0, insns_len);
+        memcpy(insns, addr, insns_len);
+
+        fwrite(insns, insns_len, 1, &dump_opcode);
         for (int i = 0; i < insns_size; ++i) {
-            u2 xx;
-            memcpy(&xx, (const void *) addr, 2);
-            LOGD("%x", xx);
-            insns.push_back(xx);
-            addr += 2;
+            LOGD("opcode:%02x", *(insns + i));
         }
+
+
+        free(insns);
 
         LOGD("----------------Code_end-------------------");
 
@@ -232,10 +320,18 @@ public:
 
     void dump(const u1 **addr) {
         field_idx_diff = readunsignedleb128(addr);
+        int xx00 = 0;
+
+        writeunsignedleb128((u1 *) &xx00, field_idx_diff);
+
+        //fwrite(&xx00, sizeof(int), 1, &class_data);
         access_flags = readunsignedleb128(addr);
+        writeunsignedleb128((u1 *) &xx00, access_flags);
+        //fwrite(&xx00, sizeof(int), 1, &class_data);
     }
 
 };
+
 
 class Encodedmethod {
 public:
@@ -243,19 +339,43 @@ public:
     int access_flags = 0;
     int code_off = 0;
 
-    void dump(const u1 **addr) {
+    void dump(const u1 **addr, DexClassDef *pDef) {
         method_idx_diff = readunsignedleb128(addr);
         access_flags = readunsignedleb128(addr);
         code_off = readunsignedleb128(addr);
-        int code_addr = code_off + (long) dexHeader;
-        CodeItem codeItem;
-        LOGD("函数名字--（%d）-----函数偏移(%d)-----------文件偏移(%d)",method_idx_diff,code_off,dexHeader->fileSize);
 
-        if (code_off>dexHeader->fileSize){
-            LOGD("函数偏移大于文件偏移(%d)需要修复",code_off-dexHeader->fileSize);
+        int xx00 = 0;
+
+        writeunsignedleb128((u1 *) &xx00, method_idx_diff);
+
+        //fwrite(&xx00, sizeof(int), 1, &class_data);
+
+        writeunsignedleb128((u1 *) &xx00, access_flags);
+        //fwrite(&xx00, sizeof(int), 1, &class_data);
+        int code_addr = code_off + (long) dexHeader;
+
+
+        //读字节码文件长度确定偏移
+        fseek(&dump_opcode, 0, SEEK_END);
+        long file_len = ftell(&class_data);
+
+        writeunsignedleb128((u1 *) &xx00, file_len + mappingxx.length+140957);
+
+        //fwrite(&xx00, sizeof(int), 1, &class_data);//这里重写写入偏移
+
+        CodeItem codeItem;
+        LOGD("函数名字--（%d）-----函数偏移(%d)-----------文件偏移(%d)", method_idx_diff, code_off,
+             dexHeader->fileSize);
+        if (code_off == 0) {
+            LOGD("------------------------这个函数（%d）没有opcode", method_idx_diff);
+            return;
+        }
+        if (code_off > dexHeader->fileSize) {
+            LOGD("函数偏移大于文件偏移(%d)需要修复", code_off - dexHeader->fileSize);
         }
 
         codeItem.dump((const u1 *) code_addr);
+
     }
 
 };
@@ -273,12 +393,23 @@ public:
     vector<Encodedmethod> virtual_methods;
 
 
-    void dump(const u1 **addr) {
-
+    void dump(const u1 **addr, DexClassDef *pDef) {
+        int yy=0x2edf90;
         static_field_size = readunsignedleb128(addr);
         instance_fields_size = readunsignedleb128(addr);
         direct_methods_size = readunsignedleb128(addr);
         virtual_methods_size = readunsignedleb128(addr);
+        int xx00=0;
+
+        writeunsignedleb128((u1 *) &xx00, static_field_size);
+        //fwrite(&xx00, sizeof(u1), 1, &class_data);
+        writeunsignedleb128((u1 *) &xx00, instance_fields_size);
+        //fwrite(&xx00, sizeof(u1), 1, &class_data);
+        writeunsignedleb128((u1 *) &xx00, direct_methods_size);
+        //fwrite(&xx00, sizeof(u1), 1, &class_data);
+        writeunsignedleb128((u1 *) &xx00, virtual_methods_size);
+        //fwrite(&xx00, sizeof(u1), 1, &class_data);
+
 
         for (int i = 0; i < static_field_size; ++i) {
             Encodedfield encodedfield;
@@ -295,14 +426,14 @@ public:
         for (int i = 0; i < direct_methods_size; ++i) {
 
             Encodedmethod encodedfield;
-            encodedfield.dump(addr);
+            encodedfield.dump(addr, pDef);
             direct_methods.push_back(encodedfield);
         }
 
 
         for (int i = 0; i < virtual_methods_size; ++i) {
             Encodedmethod encodedfield;
-            encodedfield.dump(addr);
+            encodedfield.dump(addr, pDef);
             virtual_methods.push_back(encodedfield);
         }
 
@@ -326,32 +457,73 @@ void printDexHeader(DexFile *pDexFile) {
     LOGD("这个dex一共有 %d 个类", dexHeader->classDefsSize);
 
 
-    if(dexHeader->classDefsSize==1){
+    if (dexHeader->classDefsSize == 1) {
         LOGD("这个dex类太少。不解析");
 
         return;
     }
 
 
-    LOGD("类偏移(%d)-------文件偏移(%d)",dexHeader->classDefsOff,dexHeader->fileSize);
-    if (dexHeader->classDefsOff>dexHeader->fileSize){
-        LOGD("类偏移大于文件偏移(%d)需要修复",dexHeader->classDefsOff-dexHeader->fileSize);
+    LOGD("类偏移(%d)-------dexHeader->fileSize(%d)", dexHeader->classDefsOff, dexHeader->fileSize);
+    if (dexHeader->classDefsOff > dexHeader->fileSize) {
+        LOGD("类偏移大于文件偏移(%d)需要修复", dexHeader->classDefsOff - dexHeader->fileSize);
     }
 
 
+    int new_pDexFile_len = sizeof(DexClassDef) * (dexHeader->classDefsSize);
+    DexClassDef *new_pDexFile = (DexClassDef *) malloc(new_pDexFile_len);
+    memcpy(new_pDexFile, pDexFile->pClassDefs, new_pDexFile_len);
 
-    int classDate_addr = pDexFile->pClassDefs->classDataOff + (long) dexHeader;
+    //fwrite(new_pDexFile, new_pDexFile_len, 1, &class_defs);
 
-    int *pClassDate_addr = &classDate_addr;
-
+    char*strm= (char *) malloc(40);
+    memset(strm,0,40);
+    fwrite(strm, 40, 1, &class_data);
+    fwrite(strm, 40, 1, &dump_opcode);
     for (int i = 0; i < dexHeader->classDefsSize; ++i) {
-        ClassdataItem classdataItem;
-        LOGD("------------------------类（%d）开始", i);
-        classdataItem.dump((const u1 **) pClassDate_addr);
-        LOGD("------------------------类(%d)结束", i);
+
+        fseek(&class_data, 0, SEEK_END);
+        long file_len = ftell(&class_data);
+        //fclose(&class_data);
+
+
+        new_pDexFile->classDataOff = file_len + mappingxx.length;
+        fwrite(new_pDexFile, sizeof(DexClassDef), 1, &class_defs);
+
+        new_pDexFile++;
+
+        if (pDexFile->pClassDefs->classDataOff == 0) {
+            LOGD("------------------------类（%d）没有opcode", i);
+            (pDexFile->pClassDefs)++;
+            continue;
+        } else {
+            //int classDate_addr = pDexFile->pClassDefs->classDataOff + (long) dexHeader;
+            int classDate_addr = pDexFile->pClassDefs->classDataOff + (long) dexHeader;
+
+            int *pClassDate_addr = &classDate_addr;
+
+            ClassdataItem classdataItem;
+            LOGD("------------------------类（%d）开始", i);
+            classdataItem.dump((const u1 **) pClassDate_addr, new_pDexFile);
+            LOGD("------------------------类(%d)结束", i);
+            (pDexFile->pClassDefs)++;
+        }
+
+
     }
 
+    fclose(&class_defs);
 
+    writeFile("part1");
+    writeFile("class_defs");
+    writeFile("data");
+    writeFile("class_data");
+    //writeFile("dump_opcode");
+    fclose(&class_defs);
+    fclose(&fppart1);
+    fclose(&fp_data);
+    fclose(&dump_whole);
+    fclose(&dump_opcode);
 }
 
 
@@ -428,35 +600,6 @@ string dexStringByTypeIdx(DexFile dexfile, u4 idx) {
 string dexGetClassDescriptor(DexFile dexfile, DexClassDef classdef) {
     return dexStringByTypeIdx(dexfile, classdef.classIdx);
 }
-
-
-u1 *writeunsignedleb128(u1 *ptr, u4 data) {
-
-    while (true) { //循环
-
-        u1 out = data & 0x7f;; //跟7F进行与运算 得出最后7位
-
-        if (out != data) {
-
-            *ptr++ = out | 0x80; //80就等于10000000 也就是跟前面补1
-
-            data >>= 7;// 继续下个7个字节
-
-        } else {
-
-            *ptr++ = out;
-            break;
-
-        }
-
-    }
-
-    return ptr;
-
-}
-
-
-
 
 
 class TryItem {
