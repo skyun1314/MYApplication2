@@ -23,7 +23,6 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class hookCookie {
     public static int mCookie = 0;
-
     public static void replaceClassLoader(final String my_packageName, ClassLoader classLoader) {
         try {
             Class<?> aClass = Class.forName("android.app.ActivityThread");
@@ -73,12 +72,6 @@ public class hookCookie {
                     //  XposedBridge.log("cookie: "+o1);
                     Log.e("wodelog", "cookie: " + mCookie);
 
-                   /* new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            MainActivity.aaattachBaseContext(mCookie, my_packageName);
-                        }
-                    }).start();;*/
                     MainActivity.aaattachBaseContext(mCookie, my_packageName);
                 } catch (Exception e) {
                     Log.e("wodelog", "Exception: " + e.toString());
@@ -152,8 +145,6 @@ public class hookCookie {
                             XposedBridge.log("我进入真正的onCreate了：" + Main_Activity);
 
                             replaceClassLoader(my_packageName, finalClassLoader);
-
-
                         }
                     });
 
@@ -166,7 +157,7 @@ public class hookCookie {
     }
 
     static {
-        // System.load("/data/data/com.dexpaser.zk.myapplication/lib/libzkjg-lib.so");
+         //System.load("/data/data/com.dexpaser.zk.myapplication/lib/libzkjg-lib.so");
     }
 
 }

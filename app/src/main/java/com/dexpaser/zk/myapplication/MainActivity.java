@@ -52,13 +52,18 @@ public class MainActivity extends AppCompatActivity {
         this.text = (TextView) findViewById(R.id.text);
         List<PackageInfo> packages = getPackageManager().getInstalledPackages(0);
         for (int i = 0; i < packages.size(); i++) {
-            AppListAdapter.ListItem item = new AppListAdapter.ListItem();
-            PackageInfo packageInfo = (PackageInfo) packages.get(i);
-            item.icon = packageInfo.applicationInfo.loadIcon(getPackageManager());
-            item.name = packageInfo.applicationInfo.loadLabel(getPackageManager()).toString();
-            item.pkg = packageInfo.packageName;
-            item.path = packageInfo.applicationInfo.publicSourceDir;
-            this.mListData.add(item);
+            PackageInfo pak = (PackageInfo) packages.get(i);
+            if ((pak.applicationInfo.flags & pak.applicationInfo.FLAG_SYSTEM) <= 0) {
+                AppListAdapter.ListItem item = new AppListAdapter.ListItem();
+                PackageInfo packageInfo = (PackageInfo) packages.get(i);
+                item.icon = packageInfo.applicationInfo.loadIcon(getPackageManager());
+                item.name = packageInfo.applicationInfo.loadLabel(getPackageManager()).toString();
+                item.pkg = packageInfo.packageName;
+                item.path = packageInfo.applicationInfo.publicSourceDir;
+                this.mListData.add(item);
+            }
+
+
         }
         TextView textView = this.text;
         if (this.mHasRoot) {
